@@ -1,0 +1,209 @@
+[
+    {
+      "id": "new_institute",
+      "name": "New Institutions",
+      "documents": [
+        {
+          "id": "new_institute_0",
+          "name": "Affidavit 1: Application verification and compliance",
+          "pdfPath": "https://www.dropbox.com/scl/fi/0w3n45pktfxniidcg02jq/APH-Final-201.pdf?rlkey=ba2c9qi5rvyuyi8595tdbx59t&st=doedbrw0&raw=1"
+        },
+        {
+          "id": "new_institute_1",
+          "name": "Affidavit 2: Sworn statement of data accuracy",
+          "pdfPath": "https://www.aicte-india.org/sites/default/files/AFFIDAVIT-2%20for%20the%20applications%20submitted%20under%20chapter%201%202%204.pdf"
+        },
+        {
+          "id": "new_institute_2",
+          "name": "Land Ownership documents",
+          "pdfPath": "/pdfs/new-institutions/land-ownership.pdf"
+        },
+        {
+          "id": "new_institute_3",
+          "name": "Lease agreement (if applicable)",
+          "pdfPath": "/pdfs/new-institutions/lease-agreement.pdf"
+        },
+        {
+          "id": "new_institute_4",
+          "name": "Land Use Certificate",
+          "pdfPath": "/pdfs/new-institutions/land-use-certificate.pdf"
+        },
+        {
+          "id": "new_institute_5",
+          "name": "Building Plan",
+          "pdfPath": "/pdfs/new-institutions/building-plan.pdf"
+        },
+        {
+          "id": "new_institute_6",
+          "name": "Financial Proof",
+          "pdfPath": "/pdfs/new-institutions/financial-proof.pdf"
+        },
+        {
+          "id": "new_institute_7",
+          "name": "Digital Signature Certificate (DSC)",
+          "pdfPath": "/pdfs/new-institutions/dsc.pdf"
+        },
+        {
+          "id": "new_institute_8",
+          "name": "Society/Trust/Company Registration Certificate",
+          "pdfPath": "/pdfs/new-institutions/registration-certificate.pdf"
+        },
+        {
+          "id": "new_institute_9",
+          "name": "Detailed Project Report (DPR)",
+          "pdfPath": "/pdfs/new-institutions/dpr.pdf"
+        },
+        {
+          "id": "new_institute_10",
+          "name": "Compliance Documents",
+          "pdfPath": "/pdfs/new-institutions/compliance-documents.pdf"
+        },
+        {
+          "id": "new_institute_11",
+          "name": "State NOC",
+          "pdfPath": "/pdfs/new-institutions/state-noc.pdf"
+        }
+      ]
+    },
+    {
+      "id": "eoa",
+      "name": "Extension of Approval (EoA)",
+      "documents": [
+        {
+          "id": "eoa_0",
+          "name": "Self-Disclosure Format",
+          "pdfPath": "/pdfs/eoa/self-disclosure.pdf"
+        },
+        {
+          "id": "eoa_1",
+          "name": "Accreditation Proof",
+          "pdfPath": "/pdfs/eoa/accreditation-proof.pdf"
+        },
+        {
+          "id": "eoa_2",
+          "name": "Admission Reports",
+          "pdfPath": "/pdfs/eoa/admission-reports.pdf"
+        },
+        {
+          "id": "eoa_3",
+          "name": "Financial Statements",
+          "pdfPath": "/pdfs/eoa/financial-statements.pdf"
+        },
+        {
+          "id": "eoa_4",
+          "name": "Infrastructure Readiness Report",
+          "pdfPath": "/pdfs/eoa/infrastructure-report.pdf"
+        },
+        {
+          "id": "eoa_5",
+          "name": "State/University Affiliation Letter",
+          "pdfPath": "/pdfs/eoa/affiliation-letter.pdf"
+        },
+        {
+          "id": "eoa_6",
+          "name": "Fee Payment Proof",
+          "pdfPath": "/pdfs/eoa/fee-payment-proof.pdf"
+        }
+      ]
+    },
+    {
+      "id": "collaboration",
+      "name": "Collaboration & Twinning Programs",
+      "documents": [
+        {
+          "id": "collaboration_0",
+          "name": "Memorandum of Understanding (MoU)",
+          "pdfPath": "/pdfs/collaboration/mou.pdf"
+        },
+        {
+          "id": "collaboration_1",
+          "name": "Approval Letters",
+          "pdfPath": "/pdfs/collaboration/approval-letters.pdf"
+        },
+        {
+          "id": "collaboration_2",
+          "name": "Course Curricula",
+          "pdfPath": "/pdfs/collaboration/course-curricula.pdf"
+        },
+        {
+          "id": "collaboration_3",
+          "name": "Governance and Management Structure",
+          "pdfPath": "/pdfs/collaboration/governance-structure.pdf"
+        }
+      ]
+    },
+    {
+      "id": "odl_ol",
+      "name": "Open and Distance Learning (ODL)/Online Learning (OL)",
+      "documents": [
+        {
+          "id": "odl_ol_0",
+          "name": "LMS Infrastructure Proof",
+          "pdfPath": "/pdfs/odl-ol/lms-infrastructure.pdf"
+        },
+        {
+          "id": "odl_ol_1",
+          "name": "Academic Records",
+          "pdfPath": "/pdfs/odl-ol/academic-records.pdf"
+        },
+        {
+          "id": "odl_ol_2",
+          "name": "Content Accreditation",
+          "pdfPath": "/pdfs/odl-ol/content-accreditation.pdf"
+        },
+        {
+          "id": "odl_ol_3",
+          "name": "Student Support Details",
+          "pdfPath": "/pdfs/odl-ol/student-support.pdf"
+        }
+      ]
+    },
+    {
+      "id": "penal_actions",
+      "name": "Penal Actions (For Norm Violations)",
+      "documents": [
+        {
+          "id": "penal_actions_0",
+          "name": "Compliance Report",
+          "pdfPath": "/pdfs/penal-actions/compliance-report.pdf"
+        },
+        {
+          "id": "penal_actions_1",
+          "name": "Supporting Evidence",
+          "pdfPath": "/pdfs/penal-actions/supporting-evidence.pdf"
+        },
+        {
+          "id": "penal_actions_2",
+          "name": "Affidavit",
+          "pdfPath": "/pdfs/penal-actions/affidavit.pdf"
+        }
+      ]
+    },
+    {
+      "id": "hibernation",
+      "name": "Hibernation or Closure of Institutions",
+      "documents": [
+        {
+          "id": "hibernation_0",
+          "name": "Affidavit",
+          "pdfPath": "/pdfs/hibernation-closure/affidavit.pdf"
+        },
+        {
+          "id": "hibernation_1",
+          "name": "Notification to Stakeholders",
+          "pdfPath": "/pdfs/hibernation-closure/stakeholder-notification.pdf"
+        },
+        {
+          "id": "hibernation_2",
+          "name": "Student Transition Plan",
+          "pdfPath": "/pdfs/hibernation-closure/student-transition-plan.pdf"
+        },
+        {
+          "id": "hibernation_3",
+          "name": "Financial Settlement Proof",
+          "pdfPath": "/pdfs/hibernation-closure/financial-settlement.pdf"
+        }
+      ]
+    }
+  ]
+  
