@@ -12,7 +12,7 @@ app.use(express.json())
 // Existing routes
 app.use("/institute", InstitueRouter)
 app.post("/otp", sendOtpEmail)
-
+app.get("/", (req, res) => { res.send("hiii") })
 // Proxy middleware for FastAPI chat service
 app.use('/api/chat', createProxyMiddleware({
   target: 'http://localhost:8000',

@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InstituteStatus {
+  PROCESSING
+  VERIFIED
+  UNVERIFIED
+}
+
+model ContactDetails {
+  phone        String      @id
+  title        String
+  firstName    String
+  middleName   String?
+  lastName     String
+  designation  String
+  address      String
+  district     String
+  state        String
+  postalCode   String
+  email        String      @unique
+  altEmail     String?
+  universityId String      @unique
+  university   University? @relation(fields: [universityId], references: [id])
+}
+
+model University {
+  id              String          @id @default(uuid(4))
+  email           String          @unique
+  phone           String          @unique
+  password        String
+  universityName  String
+  universityType  String
+  state           String
+  district        String
+  pincode         Int
+  status          InstituteStatus @default(UNVERIFIED)
+  contatctDetails ContactDetails?
+}

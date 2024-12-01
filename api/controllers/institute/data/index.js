@@ -1,18 +1,19 @@
-const db = require("../../../utils/db");
+const { prisma } = require("../../../utils/db");
 
 const get_institute_data = async (req, res) => {
     const { instituteId } = req.body
     try {
-        const query = `
-          SELECT institute_id, institute_data
-          FROM institute WHERE id = $1; 
-        `;
+        // const query = `
+        //   SELECT institute_id, institute_data
+        //   FROM institute WHERE id = $1; 
+        // `;
 
-        const result = await db.query(query, [instituteId]);
+        // const result = await db.query(query, [instituteId]);
 
+        const result = await prisma.university.findUnique({ where: { id: instituteId } })
         res.status(200).json({
             success: true,
-            data: result.rows[0], // Returns an array of objects with institute_id and institute_data
+            data: result, // Returns an array of objects with institute_id and institute_data
         });
     } catch (error) {
         console.error("Error fetching data:", error);
