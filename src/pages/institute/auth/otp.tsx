@@ -92,7 +92,6 @@ export default function InstituteOtpForm() {
     console.log("Form submitted with:", values);
     if (serverOtp === values.otp) {
       const query = await registerUser({
-        institute_id: data.basicDetails.permanentInstituteId,
         institute_data: data,
         password: values.password,
       });
@@ -262,7 +261,7 @@ export default function InstituteOtpForm() {
           </CardContent>
         </Card>
 
-        <ExpandableSection
+        {/* <ExpandableSection
           title="Basic Details"
           isExpanded={expandedSection === "basic"}
           onToggle={() =>
@@ -306,7 +305,7 @@ export default function InstituteOtpForm() {
               </p>
             </div>
           </div>
-        </ExpandableSection>
+        </ExpandableSection> */}
 
         <ExpandableSection
           title="Contact Details"

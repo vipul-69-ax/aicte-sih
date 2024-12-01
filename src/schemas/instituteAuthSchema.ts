@@ -44,7 +44,6 @@ export const universityDetailsSchema = z.object({
 })
 
 export const formSchema = z.object({
-  basicDetails: basicDetailsSchema,
   contactDetails: contactDetailsSchema,
   universityDetails: universityDetailsSchema,
 })

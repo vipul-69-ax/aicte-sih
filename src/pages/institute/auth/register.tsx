@@ -1,50 +1,67 @@
-import React, { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, CheckCircle2, Circle, ArrowRight, Mail, Phone, MapPin, Building, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Link, useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-import { Calendar, Fingerprint, GraduationCap } from 'lucide-react';
-import AicteLogo from '@/assets/aicte-logo.webp'
-const basicDetailsSchema = z.object({
-  applicationNumber: z.string().min(1, 'Application number is required'),
-  applicationOpenDate: z.date({ required_error: 'Application open date is required' }),
-  permanentInstituteId: z.string().min(1, 'Permanent Institute ID is required'),
-  academicYear: z.string().min(1, 'Academic year is required'),
-  instituteStatus: z.string().default('Not Submitted'),
-});
+import React, { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  Circle,
+  ArrowRight,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+  User,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Link, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { Calendar, Fingerprint, GraduationCap } from "lucide-react";
+import AicteLogo from "@/assets/aicte-logo.webp";
 
 const contactDetailsSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be 10 digits'),
-  address: z.string().min(1, 'Address is required'),
-  state: z.string().min(1, 'State is required'),
-  district: z.string().min(1, 'District is required'),
-  postalCode: z.string().length(6, 'Postal code must be 6 digits'),
+  title: z.string().min(1, "Title is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  designation: z.string().min(1, "Designation is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be 10 digits"),
+  address: z.string().min(1, "Address is required"),
+  state: z.string().min(1, "State is required"),
+  district: z.string().min(1, "District is required"),
+  postalCode: z.string().length(6, "Postal code must be 6 digits"),
 });
 
 const universityDetailsSchema = z.object({
-  universityName: z.string().min(1, 'University name is required'),
-  instituteType: z.string().min(1, 'Institute type is required'),
-  state: z.string().min(1, 'State is required'),
-  district: z.string().min(1, 'District is required'),
-  pincode: z.string().length(6, 'Pincode must be 6 digits'),
-  email: z.string().email('Invalid email address'),
-  contactNumber: z.string().min(10, 'Contact number must be 10 digits'),
+  universityName: z.string().min(1, "University name is required"),
+  instituteType: z.string().min(1, "Institute type is required"),
+  state: z.string().min(1, "State is required"),
+  district: z.string().min(1, "District is required"),
+  pincode: z.string().length(6, "Pincode must be 6 digits"),
+  email: z.string().email("Invalid email address"),
+  contactNumber: z.string().min(10, "Contact number must be 10 digits"),
 });
 
 const formSchema = z.object({
-  basicDetails: basicDetailsSchema,
   contactDetails: contactDetailsSchema,
   universityDetails: universityDetailsSchema,
 });
@@ -52,37 +69,67 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const steps = [
-  { 
-    id: 1, 
-    name: 'Basic Details',
-    description: 'Institute identification and application details'
+  {
+    id: 1,
+    name: "Contact Details",
+    description: "Primary contact information for the institute",
   },
-  { 
-    id: 2, 
-    name: 'Contact Details',
-    description: 'Primary contact information for the institute'
-  },
-  { 
-    id: 3, 
-    name: 'University Details',
-    description: 'Detailed information about the institution'
+  {
+    id: 2,
+    name: "University Details",
+    description: "Detailed information about the institution",
   },
 ];
 
 const indianStates = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
-  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
-  'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
-  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
-  'Ladakh', 'Lakshadweep', 'Puducherry'
+  "Andaman and Nicobar Islands",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
 ];
 
 const instituteTypes = [
-  'Central University', 'State University', 'Deemed University', 'Private University',
-  'Institute of National Importance', 'Autonomous College', 'Affiliated College',
-  'Constituent College', 'Standalone Institution'
+  "Affiliated College",
+  "Autonomous College",
+  "Central University",
+  "Constituent College",
+  "Deemed University",
+  "Institute of National Importance",
+  "Private University",
+  "Standalone Institution",
+  "State University",
 ];
 
 export default function InstituteRegistrationForm() {
@@ -90,48 +137,38 @@ export default function InstituteRegistrationForm() {
   const [formData, setFormData] = useState<Partial<FormData>>({});
   const navigate = useNavigate();
 
-  const basicDetailsForm = useForm<z.infer<typeof basicDetailsSchema>>({
-    resolver: zodResolver(basicDetailsSchema),
-    defaultValues: {
-      applicationNumber: `AICTE-${Math.random().toString(36).substr(2, 9)}`,
-      permanentInstituteId: `AICTE-${Math.random().toString(36).substr(2, 9)}`,
-      applicationOpenDate: new Date(),
-      instituteStatus: 'Not Submitted',
-      academicYear: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
-    },
-  });
-
   const contactDetailsForm = useForm<z.infer<typeof contactDetailsSchema>>({
     resolver: zodResolver(contactDetailsSchema),
   });
 
-  const universityDetailsForm = useForm<z.infer<typeof universityDetailsSchema>>({
+  const universityDetailsForm = useForm<
+    z.infer<typeof universityDetailsSchema>
+  >({
     resolver: zodResolver(universityDetailsSchema),
   });
 
-  const onBasicDetailsSubmit = (data: z.infer<typeof basicDetailsSchema>) => {
-    setFormData((prev) => ({ ...prev, basicDetails: data }));
+  const onContactDetailsSubmit = (
+    data: z.infer<typeof contactDetailsSchema>
+  ) => {
+    setFormData((prev) => ({ ...prev, contactDetails: data }));
     setCurrentStep(2);
   };
 
-  const onContactDetailsSubmit = (data: z.infer<typeof contactDetailsSchema>) => {
-    setFormData((prev) => ({ ...prev, contactDetails: data }));
-    setCurrentStep(3);
-  };
-
-  const onUniversityDetailsSubmit = async (data: z.infer<typeof universityDetailsSchema>) => {
+  const onUniversityDetailsSubmit = async (
+    data: z.infer<typeof universityDetailsSchema>
+  ) => {
     const finalFormData = {
       ...formData,
       universityDetails: data,
     };
-    console.log('Final Form Data:', finalFormData);
+    console.log("Final Form Data:", finalFormData);
     navigate("/institute/otp", { state: finalFormData });
   };
 
   const containerVariants = {
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 }
+    exit: { opacity: 0, x: -20 },
   };
 
   return (
@@ -142,9 +179,11 @@ export default function InstituteRegistrationForm() {
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
               <img src={AicteLogo} alt="AICTE Logo" className="h-10 w-10" />
-              <h2 className="text-xl font-semibold text-[#2c3e50]">Institute</h2>
+              <h2 className="text-xl font-semibold text-[#2c3e50]">
+                Institute
+              </h2>
             </div>
-            
+
             <div className="space-y-8 mt-12">
               {steps.map((step) => (
                 <motion.div
@@ -154,7 +193,9 @@ export default function InstituteRegistrationForm() {
                     currentStep >= step.id ? "text-[#3498db]" : "text-gray-500"
                   )}
                   whileHover={{ x: 4 }}
-                  onClick={() => currentStep >= step.id && setCurrentStep(step.id)}
+                  onClick={() =>
+                    currentStep >= step.id && setCurrentStep(step.id)
+                  }
                 >
                   <div className="flex items-center h-9">
                     {currentStep > step.id ? (
@@ -166,10 +207,14 @@ export default function InstituteRegistrationForm() {
                     )}
                   </div>
                   <div className="ml-4">
-                    <p className={cn(
-                      "text-sm font-medium",
-                      currentStep >= step.id ? "text-[#3498db]" : "text-[#2c3e50]"
-                    )}>
+                    <p
+                      className={cn(
+                        "text-sm font-medium",
+                        currentStep >= step.id
+                          ? "text-[#3498db]"
+                          : "text-[#2c3e50]"
+                      )}
+                    >
                       {step.name}
                     </p>
                     <p className="text-sm text-gray-500">{step.description}</p>
@@ -200,7 +245,7 @@ export default function InstituteRegistrationForm() {
         <div className="flex-1 ml-80">
           <div className="max-w-3xl mx-auto py-12 px-8">
             <AnimatePresence mode="wait">
-              {currentStep === 1 && (
+              {/* {currentStep === 1 && (
                 <motion.div
                   key="basic-details"
                   variants={containerVariants}
@@ -308,9 +353,9 @@ export default function InstituteRegistrationForm() {
                     </form>
                   </Form>
                 </motion.div>
-              )}
+              )} */}
 
-              {currentStep === 2 && (
+              {currentStep === 1 && (
                 <motion.div
                   key="contact-details"
                   variants={containerVariants}
@@ -320,20 +365,34 @@ export default function InstituteRegistrationForm() {
                   className="space-y-8"
                 >
                   <div>
-                    <h1 className="text-3xl font-bold text-[#2c3e50]">Contact Details</h1>
-                    <p className="mt-2 text-[#7f8c8d]">Please provide the contact information for your institute</p>
+                    <h1 className="text-3xl font-bold text-[#2c3e50]">
+                      Contact Details
+                    </h1>
+                    <p className="mt-2 text-[#7f8c8d]">
+                      Please provide the contact information for your institute
+                    </p>
                   </div>
 
                   <Form {...contactDetailsForm}>
-                    <form onSubmit={contactDetailsForm.handleSubmit(onContactDetailsSubmit)} className="space-y-6">
+                    <form
+                      onSubmit={contactDetailsForm.handleSubmit(
+                        onContactDetailsSubmit
+                      )}
+                      className="space-y-6"
+                    >
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={contactDetailsForm.control}
                           name="title"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">Title</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormLabel className="text-[#2c3e50]">
+                                Title
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger className="bg-white border-[#e0e0e0] focus:ring-[#3498db]">
                                     <SelectValue placeholder="Select title" />
@@ -356,10 +415,15 @@ export default function InstituteRegistrationForm() {
                           name="firstName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">First Name</FormLabel>
+                              <FormLabel className="text-[#2c3e50]">
+                                First Name
+                              </FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                  <Input
+                                    {...field}
+                                    className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                  />
                                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                                 </div>
                               </FormControl>
@@ -373,10 +437,15 @@ export default function InstituteRegistrationForm() {
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Last Name</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Last Name
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -389,11 +458,38 @@ export default function InstituteRegistrationForm() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Email</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Email
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} type="email" className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={contactDetailsForm.control}
+                        name="designation"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-[#2c3e50]">
+                              Designation
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -405,10 +501,15 @@ export default function InstituteRegistrationForm() {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Phone</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Phone
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -421,10 +522,15 @@ export default function InstituteRegistrationForm() {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Address</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Address
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -438,8 +544,13 @@ export default function InstituteRegistrationForm() {
                           name="state"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">State</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormLabel className="text-[#2c3e50]">
+                                State
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger className="bg-white border-[#e0e0e0] focus:ring-[#3498db]">
                                     <SelectValue placeholder="Select state" />
@@ -462,9 +573,14 @@ export default function InstituteRegistrationForm() {
                           name="district"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">District</FormLabel>
+                              <FormLabel className="text-[#2c3e50]">
+                                District
+                              </FormLabel>
                               <FormControl>
-                                <Input {...field} className="bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -476,10 +592,15 @@ export default function InstituteRegistrationForm() {
                         name="postalCode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Postal Code</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Postal Code
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -510,7 +631,7 @@ export default function InstituteRegistrationForm() {
                 </motion.div>
               )}
 
-              {currentStep === 3 && (
+              {currentStep === 2 && (
                 <motion.div
                   key="university-details"
                   initial="hidden"
@@ -519,21 +640,35 @@ export default function InstituteRegistrationForm() {
                   className="space-y-8"
                 >
                   <div>
-                    <h1 className="text-3xl font-bold text-[#2c3e50]">University Details</h1>
-                    <p className="mt-2 text-[#7f8c8d]">Please provide detailed information about your institution</p>
+                    <h1 className="text-3xl font-bold text-[#2c3e50]">
+                      University Details
+                    </h1>
+                    <p className="mt-2 text-[#7f8c8d]">
+                      Please provide detailed information about your institution
+                    </p>
                   </div>
 
                   <Form {...universityDetailsForm}>
-                    <form onSubmit={universityDetailsForm.handleSubmit(onUniversityDetailsSubmit)} className="space-y-6">
+                    <form
+                      onSubmit={universityDetailsForm.handleSubmit(
+                        onUniversityDetailsSubmit
+                      )}
+                      className="space-y-6"
+                    >
                       <FormField
                         control={universityDetailsForm.control}
                         name="universityName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">University Name</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              University Name
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -546,8 +681,13 @@ export default function InstituteRegistrationForm() {
                         name="instituteType"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Institute Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormLabel className="text-[#2c3e50]">
+                              Institute Type
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
                               <FormControl>
                                 <SelectTrigger className="bg-white border-[#e0e0e0] focus:ring-[#3498db]">
                                   <SelectValue placeholder="Select institute type" />
@@ -571,8 +711,13 @@ export default function InstituteRegistrationForm() {
                           name="state"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">State</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormLabel className="text-[#2c3e50]">
+                                State
+                              </FormLabel>
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
                                 <FormControl>
                                   <SelectTrigger className="bg-white border-[#e0e0e0] focus:ring-[#3498db]">
                                     <SelectValue placeholder="Select state" />
@@ -595,9 +740,14 @@ export default function InstituteRegistrationForm() {
                           name="district"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-[#2c3e50]">District</FormLabel>
+                              <FormLabel className="text-[#2c3e50]">
+                                District
+                              </FormLabel>
                               <FormControl>
-                                <Input {...field} className="bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -609,10 +759,15 @@ export default function InstituteRegistrationForm() {
                         name="pincode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Pincode</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Pincode
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -625,10 +780,16 @@ export default function InstituteRegistrationForm() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Email</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Email
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} type="email" className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  type="email"
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -641,10 +802,15 @@ export default function InstituteRegistrationForm() {
                         name="contactNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Contact Number</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Contact Number
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
-                                <Input {...field} className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]" />
+                                <Input
+                                  {...field}
+                                  className="pl-10 bg-white border-[#e0e0e0] focus-visible:ring-[#3498db]"
+                                />
                                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#7f8c8d]" />
                               </div>
                             </FormControl>
@@ -713,4 +879,3 @@ const styles = `
   animation-delay: 4s;
 }
 `;
-

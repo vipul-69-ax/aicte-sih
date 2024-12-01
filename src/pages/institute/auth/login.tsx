@@ -25,12 +25,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useInstituteExists, useInstituteLogin } from "@/hooks/useAuth";
 import { useOtp } from "@/hooks/useOTP";
-import { Loader2, Lock, Mail, Shield } from 'lucide-react';
+import { Loader2, Lock, Mail, Shield } from "lucide-react";
 import { BackgroundLayout } from "@/components/BackgroundLayout";
-import AicteImage from '@/assets/aicte-logo.webp'
+import AicteImage from "@/assets/aicte-logo.webp";
 
 const loginSchema = z.object({
-  permanentInstituteId: z.string().min(1, "Permanent Institute ID is required"),
+  authKey: z.string().min(1, "Permanent Institute ID is required"),
   otp: z.string().length(6, "OTP must be 6 digits").optional(),
   password: z
     .string()
@@ -46,14 +46,16 @@ export default function LoginPage() {
   const [otpSent, setOtpSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { mutateAsync: checkInstitute, isPending: isChecking } = useInstituteExists();
+  const { mutateAsync: checkInstitute, isPending: isChecking } =
+    useInstituteExists();
   const [serverOtp, setServerOtp] = useState("");
   const { mutateAsync: sendOtpMethod, isPending: isSending } = useOtp();
-  const { mutateAsync: loginMethod, isPending: isLoggingIn } = useInstituteLogin();
+  const { mutateAsync: loginMethod, isPending: isLoggingIn } =
+    useInstituteLogin();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      permanentInstituteId: "",
+      authKey: "",
       otp: "",
       password: "",
     },
@@ -69,7 +71,7 @@ export default function LoginPage() {
     }
     try {
       await loginMethod({
-        institute_id: values.permanentInstituteId,
+        authKey: values.authKey,
         password: values.password,
       });
       toast({
@@ -87,13 +89,13 @@ export default function LoginPage() {
   };
 
   const sendOtp = async () => {
-    const instituteId = form.getValues("permanentInstituteId");
-    const exists = await checkInstitute({ institute_id: instituteId });
+    const authKey = form.getValues("authKey");
+    const exists = await checkInstitute({ authKey: authKey });
     if (!exists.success) {
       toast({ title: "Institute does not exist", variant: "destructive" });
       return;
     }
-    const res = await sendOtpMethod({ email: instituteId });
+    const res = await sendOtpMethod({ email: authKey });
     if (res.success) {
       setServerOtp(res.otp);
       toast({
@@ -152,10 +154,12 @@ export default function LoginPage() {
                 >
                   <FormField
                     control={form.control}
-                    name="permanentInstituteId"
+                    name="authKey"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[#2c3e50]">Permanent Institute ID</FormLabel>
+                        <FormLabel className="text-[#2c3e50]">
+                          Email/Phone No
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
@@ -197,7 +201,9 @@ export default function LoginPage() {
                         name="otp"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">OTP</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              OTP
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
@@ -217,7 +223,9 @@ export default function LoginPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Password</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Password
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input

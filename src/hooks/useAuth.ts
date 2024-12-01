@@ -6,7 +6,6 @@ import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 
 interface InstituteRegistrationData {
-  institute_id: string;
   institute_data: object;
   password: string;
 }
@@ -48,7 +47,7 @@ const useInstituteRegistration = () => {
 const useInstituteExists = () => {
   const mutation = useMutation({
     mutationKey: ["institute-check"],
-    mutationFn: async (formData: { institute_id: string }) => {
+    mutationFn: async (formData: { authKey: string }) => {
       const res = await axios.post(
         `${SERVER_URL}/institute/auth/institute_exists`,
         formData
@@ -67,7 +66,7 @@ const useInstituteExists = () => {
 };
 
 interface InstituteLoginData {
-  institute_id: string;
+  authKey: string;
   password: string;
 }
 

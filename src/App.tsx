@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "./hooks/useAuth";
 
@@ -12,6 +17,7 @@ import RegisterPage from "./pages/institute/auth/register";
 import ForgotPasswordPage from "./pages/institute/auth/forgot";
 import ApplicationData from "./pages/institute/applications/Application";
 import Settings from "./pages/institute/settings";
+import InstituteOtpForm from "./pages/institute/auth/otp";
 
 export const queryClient = new QueryClient();
 
@@ -38,21 +44,38 @@ export default function App() {
           <>
             <Route path="/institute/login" element={<LoginPage />} />
             <Route path="/institute/register" element={<RegisterPage />} />
+            <Route path="/institute/otp" element={<InstituteOtpForm />} />
             <Route path="/institute/forgot" element={<ForgotPasswordPage />} />
+            <Route
+              path="/institute/*"
+              element={<Navigate to="/institute/login" />}
+            />
           </>
         ) : (
           // Redirect logged-in users trying to access auth routes
           <>
-            <Route path="/institute/login" element={<Navigate to="/institute/dashboard" replace />} />
-            <Route path="/institute/register" element={<Navigate to="/institute/dashboard" replace />} />
-            <Route path="/institute/forgot" element={<Navigate to="/institute/dashboard" replace />} />
+            <Route
+              path="/institute/login"
+              element={<Navigate to="/institute/dashboard" replace />}
+            />
+            <Route
+              path="/institute/register"
+              element={<Navigate to="/institute/dashboard" replace />}
+            />
+            <Route
+              path="/institute/forgot"
+              element={<Navigate to="/institute/dashboard" replace />}
+            />
           </>
         )}
 
         {/* Institute Routes (Protected) */}
         {token && mode && (
           <Route path="/institute">
-            <Route index element={<Navigate to="/institute/dashboard" replace />} />
+            <Route
+              index
+              element={<Navigate to="/institute/dashboard" replace />}
+            />
             <Route path="dashboard" element={<AICTEDashboard />} />
             <Route path="applications" element={<InstituteApplication />} />
             <Route path="applications/:id" element={<ApplicationData />} />
@@ -61,7 +84,10 @@ export default function App() {
         )}
 
         {/* Catch-all route */}
-        <Route path="*" element={<div className="p-4">This page does not exist</div>} />
+        <Route
+          path="*"
+          element={<div className="p-4">This page does not exist</div>}
+        />
       </Routes>
     </QueryClientProvider>
   );

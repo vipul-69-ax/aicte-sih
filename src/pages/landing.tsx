@@ -189,7 +189,7 @@ export default function Component() {
                   asChild
                   className="bg-blue-600 text-white hover:bg-blue-700 px-8 h-12 text-lg"
                 >
-                  <Link to="/institute">Register Institution</Link>
+                  <Link to="/institute/register">Register Institution</Link>
                 </Button>
                 <Button
                   asChild

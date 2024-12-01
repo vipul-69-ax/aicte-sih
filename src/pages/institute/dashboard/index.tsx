@@ -45,12 +45,12 @@ import { useInstituteData, useInstituteStore } from "@/hooks/useInstituteData";
 import { useAuthStore } from "@/hooks/useAuth";
 import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
+import Institute from "../../admin/index";
 
-const typedApplicationTypes: any[] = applicationTypes
+const typedApplicationTypes: any[] = applicationTypes;
 
 const DashboardSkeleton: React.FC = () => (
   <div className="min-h-screen bg-background">
-
     <div className="ml-64 mr-80 p-8">
       <Skeleton className="h-8 w-64 mb-2" />
       <Skeleton className="h-4 w-96 mb-8" />
@@ -127,7 +127,7 @@ interface UniversityData {
   state: string;
   pincode: string;
   district: string;
-  contactNumber: string;
+  phone: string;
   instituteType: string;
   universityName: string;
 }
@@ -144,14 +144,18 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
           <AvatarImage src="/placeholder-user.jpg" alt="University Avatar" />
           <AvatarFallback>UN</AvatarFallback>
         </Avatar>
-        <h2 className="text-2xl font-semibold text-gray-800">{data.universityName}</h2>
+        <h2 className="text-2xl font-semibold text-gray-800">
+          {data.universityName}
+        </h2>
         <p className="text-sm text-gray-600">{data.instituteType}</p>
       </div>
 
       <div className="space-y-6">
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-800">Contact Information</CardTitle>
+            <CardTitle className="text-lg text-gray-800">
+              Contact Information
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center text-sm">
@@ -160,7 +164,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
             </div>
             <div className="flex items-center text-sm">
               <Phone className="w-5 h-5 mr-3 text-blue-500" />
-              <span className="text-gray-700">{data.contactNumber}</span>
+              <span className="text-gray-700">{data.phone}</span>
             </div>
             <div className="flex items-center text-sm">
               <MapPin className="w-5 h-5 mr-3 text-blue-500" />
@@ -171,7 +175,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
 
         <Card className="bg-white shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-800">Application Status</CardTitle>
+            <CardTitle className="text-lg text-gray-800">
+              Application Status
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -185,7 +191,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
                 </div>
               </div>
               <div className="pt-4 border-t border-gray-200">
-                <h4 className="text-sm font-medium text-gray-800 mb-2">Recent Activity</h4>
+                <h4 className="text-sm font-medium text-gray-800 mb-2">
+                  Recent Activity
+                </h4>
                 <div className="space-y-2">
                   <p className="text-xs text-gray-600">
                     Documents uploaded - 2 days ago
@@ -218,6 +226,7 @@ const MainContent: React.FC<MainContentProps> = ({
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false);
   const { mutateAsync: upload, isPending } = useApplicationUpload();
   const onSubmit = async (formData: { name: string; description: string }) => {
+    console.log(instituteId);
     const data: Application = {
       application_id: `Application-${uuid4()}`,
       application_description: formData.description,
@@ -296,7 +305,9 @@ const MainContent: React.FC<MainContentProps> = ({
                 <item.icon className={`w-6 h-6 ${item.color}`} />
               </CardHeader>
               <CardContent>
-                <div className={`text-3xl font-bold ${item.color}`}>{item.value}</div>
+                <div className={`text-3xl font-bold ${item.color}`}>
+                  {item.value}
+                </div>
                 <p className="text-sm text-gray-600 mt-1">{item.change}</p>
               </CardContent>
             </Card>
@@ -310,7 +321,9 @@ const MainContent: React.FC<MainContentProps> = ({
             <BookOpen className="w-6 h-6 mr-3 text-blue-600" />
             Start New Application
           </CardTitle>
-          <CardDescription className="text-gray-600">Select an application type to begin</CardDescription>
+          <CardDescription className="text-gray-600">
+            Select an application type to begin
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -344,13 +357,19 @@ const MainContent: React.FC<MainContentProps> = ({
                     </span>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                        >
                           View Format
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="max-w-4xl max-h-[80vh]">
                         <DialogHeader>
-                          <DialogTitle className="text-2xl text-gray-800">{doc.name}</DialogTitle>
+                          <DialogTitle className="text-2xl text-gray-800">
+                            {doc.name}
+                          </DialogTitle>
                           <DialogDescription className="text-gray-600">
                             Please review the document format
                           </DialogDescription>
@@ -369,11 +388,15 @@ const MainContent: React.FC<MainContentProps> = ({
             onOpenChange={setIsSubmitDialogOpen}
           >
             <DialogTrigger asChild>
-              <Button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">Start Application</Button>
+              <Button className="mt-6 bg-blue-600 hover:bg-blue-700 text-white">
+                Start Application
+              </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl text-gray-800">Submit Application</DialogTitle>
+                <DialogTitle className="text-2xl text-gray-800">
+                  Submit Application
+                </DialogTitle>
                 <DialogDescription className="text-gray-600">
                   Please provide the details for your new application.
                 </DialogDescription>
@@ -395,20 +418,20 @@ export default function Dashboard() {
     applicationTypes[0].name
   );
   const { token } = useAuthStore();
-  const { setInstituteId } = useInstituteStore()
+  const { setInstituteId } = useInstituteStore();
   const { mutateAsync: getInstituteData } = useInstituteData();
   const [instituteData, setInstituteData] = React.useState<any>();
   const fetchInstituteData = async () => {
     const data = await getInstituteData(token as string);
     setInstituteData(data.data);
-    setInstituteId(data.data.institute_id)
+    setInstituteId(data.data.id);
   };
   const universityData: UniversityData = {
     email: "sharmavipul01002@gmail.com",
     state: "Punjab",
     pincode: "140301",
     district: "Mohali",
-    contactNumber: "9399563226",
+    phone: "9399563226",
     instituteType: "Private University",
     universityName: "Chandigarh University",
   };
@@ -427,9 +450,9 @@ export default function Dashboard() {
           applicationTypes={typedApplicationTypes}
           selectedType={selectedType}
           setSelectedType={setSelectedType}
-          instituteId={instituteData?.institute_id}
+          instituteId={instituteData?.id}
         />
-        <RightSidebar data={universityData} />
+        <RightSidebar data={instituteData ? instituteData : universityData} />
       </div>
     </div>
   );

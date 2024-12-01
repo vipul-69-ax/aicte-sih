@@ -25,13 +25,16 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
-import { useInstituteExists, useInstituteForgotPassword } from "@/hooks/useAuth";
+import {
+  useInstituteExists,
+  useInstituteForgotPassword,
+} from "@/hooks/useAuth";
 import { useOtp } from "@/hooks/useOTP";
-import { Loader2, Lock, Mail, Shield } from 'lucide-react';
-import AicteImage from '@/assets/aicte-logo.webp'
+import { Loader2, Lock, Mail, Shield } from "lucide-react";
+import AicteImage from "@/assets/aicte-logo.webp";
 import { BackgroundLayout } from "@/components/BackgroundLayout";
 const forgotSchema = z.object({
-  permanentInstituteId: z.string().min(1, "Permanent Institute ID is required"),
+  authKey: z.string().min(1, "Permanent Institute ID is required"),
   otp: z.string().length(6, "OTP must be 6 digits").optional(),
   password: z
     .string()
@@ -46,19 +49,22 @@ const forgotSchema = z.object({
 export default function InstituteForgotPasswordPage() {
   const [otpSent, setOtpSent] = useState(false);
   const { toast } = useToast();
-  const { mutateAsync: checkInstitute, isPending: isChecking } = useInstituteExists();
+  const { mutateAsync: checkInstitute, isPending: isChecking } =
+    useInstituteExists();
   const [serverOtp, setServerOtp] = useState("");
   const { mutateAsync: sendOtpMethod, isPending: isSending } = useOtp();
-  const { mutateAsync: loginMethod, isPending: isLoggingIn } = useInstituteForgotPassword();
+  const { mutateAsync: loginMethod, isPending: isLoggingIn } =
+    useInstituteForgotPassword();
   const form = useForm<z.infer<typeof forgotSchema>>({
     resolver: zodResolver(forgotSchema),
     defaultValues: {
-      permanentInstituteId: "",
+      authKey: "",
       otp: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof forgotSchema>) => {
+    console.log("hi", otpSent);
     if (serverOtp !== values.otp) {
       toast({
         title: "OTP is not valid",
@@ -67,9 +73,10 @@ export default function InstituteForgotPasswordPage() {
       return;
     }
     await loginMethod({
-      institute_id: values.permanentInstituteId,
+      authKey: values.authKey,
       password: values.password,
     });
+
     toast({
       title: "Password reset successful",
       description: "You can now log in with your new password.",
@@ -77,13 +84,13 @@ export default function InstituteForgotPasswordPage() {
   };
 
   const sendOtp = async () => {
-    const instituteId = form.getValues("permanentInstituteId");
-    const exists = await checkInstitute({ institute_id: instituteId });
+    const authKey = form.getValues("authKey");
+    const exists = await checkInstitute({ authKey: authKey });
     if (!exists.success) {
       toast({ title: "Institute does not exist", variant: "destructive" });
       return;
     }
-    const res = await sendOtpMethod({ email: instituteId });
+    const res = await sendOtpMethod({ email: authKey });
     if (res.success) {
       setServerOtp(res.otp);
       toast({
@@ -142,10 +149,12 @@ export default function InstituteForgotPasswordPage() {
                 >
                   <FormField
                     control={form.control}
-                    name="permanentInstituteId"
+                    name="authKey"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-[#2c3e50]">Permanent Institute ID</FormLabel>
+                        <FormLabel className="text-[#2c3e50]">
+                          Email/Phone
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Input
@@ -187,7 +196,9 @@ export default function InstituteForgotPasswordPage() {
                         name="otp"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">OTP</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              OTP
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
@@ -207,7 +218,9 @@ export default function InstituteForgotPasswordPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-[#2c3e50]">Set New Password</FormLabel>
+                            <FormLabel className="text-[#2c3e50]">
+                              Set New Password
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Input
@@ -270,4 +283,3 @@ export default function InstituteForgotPasswordPage() {
     </BackgroundLayout>
   );
 }
-
