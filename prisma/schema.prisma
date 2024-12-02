@@ -13,10 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum InstituteStatus {
+enum DocumentStatus {
+  NOT_SUBMITTED
+  SUBMITTED
   PROCESSING
   VERIFIED
+  APPROVED
+  REJECTED
+}
+
+enum InstituteStatus {
   UNVERIFIED
+  PROCESSING
+  VERIFIED
+  APPROVED
+  REJECTED
 }
 
 model ContactDetails {
@@ -37,15 +48,66 @@ model ContactDetails {
 }
 
 model University {
-  id              String          @id @default(uuid(4))
-  email           String          @unique
-  phone           String          @unique
-  password        String
-  universityName  String
-  universityType  String
-  state           String
-  district        String
-  pincode         Int
-  status          InstituteStatus @default(UNVERIFIED)
-  contatctDetails ContactDetails?
+  id                    String                  @id @default(uuid(4))
+  email                 String                  @unique
+  phone                 String                  @unique
+  password              String
+  universityName        String
+  universityType        String
+  state                 String
+  district              String
+  pincode               Int
+  status                InstituteStatus         @default(UNVERIFIED)
+  contatctDetails       ContactDetails?
+  UniversityApplication UniversityApplication[]
+}
+
+model UniversityApplication {
+  uni_application_id  String                @id @default(uuid())
+  application_id      String
+  messages            Json?
+  universityId        String
+  university          University            @relation(fields: [universityId], references: [id])
+  status              DocumentStatus        @default(NOT_SUBMITTED)
+  application         ApplicationTypes      @relation(fields: [application_id], references: [application_id])
+  UniversityDocuments UniversityDocuments[]
+}
+
+model UniversityDocuments {
+  uni_doc_id         String                @id @default(uuid())
+  uni_application_id String
+  doc_id             String
+  uni_doc_name       String
+  errors             Json?
+  uni_doc_uri        String?
+  timestamp          DateTime              @default(now())
+  messages           Json?
+  status             DocumentStatus        @default(NOT_SUBMITTED)
+  application        UniversityApplication @relation(fields: [uni_application_id], references: [uni_application_id])
+  document           Document              @relation(fields: [doc_id], references: [doc_id])
+}
+
+model ApplicationTypes {
+  application_id          String                  @id @default(uuid())
+  application_name        String
+  application_description String
+  documents               ApplicationDocuments[]
+  UniversityApplication   UniversityApplication[]
+}
+
+model Document {
+  doc_id              String                 @id
+  doc_name            String
+  format_uri          String?
+  application_type    ApplicationDocuments[]
+  UniversityDocuments UniversityDocuments[]
+}
+
+model ApplicationDocuments {
+  application_id String
+  doc_id         String
+  applicationR   ApplicationTypes @relation(fields: [application_id], references: [application_id])
+  documentR      Document         @relation(fields: [doc_id], references: [doc_id])
+
+  @@unique([application_id, doc_id])
 }

@@ -1,7 +1,7 @@
 const { v4: uuid } = require("uuid");
 const argon2 = require("argon2");
 const { verifyUniversity } = require("../../../services/university_validation");
-const { prisma } = require("../../../utils/db");
+const prisma = require("../../../utils/db");
 
 async function institute_register(req, res) {
   const { institute_id, institute_data, password } = req.body;
@@ -190,7 +190,7 @@ const resetPassword = async (req, res) => {
     // const updateQuery = `UPDATE institute SET password = $1 WHERE institute_id = $2`;
     // await pool.query(updateQuery, [hashedPassword, institute_id]);
 
-    await prisma.university.update({where:{email: authKey},data:{password: hashedPassword}})
+    await prisma.university.update({ where: { email: authKey }, data: { password: hashedPassword } })
     return res.status(200).json({ success: true, message: "Password updated successfully." });
   } catch (error) {
     console.error("Error in resetting password:", error);
