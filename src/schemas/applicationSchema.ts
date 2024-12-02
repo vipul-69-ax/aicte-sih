@@ -1,18 +1,17 @@
 export type ApplicationDocument = {
-  document_id: string;
-  document_name: string;
-
+  uni_doc_id: string;
+  doc_id: string;
+  uni_doc_name: string;
   errors?: Record<string, any>[];
-  user_document_uri?: string;
-  format_uri: string;
+  uni_doc_uri?: string;
   timestamp: Date;
-  status: "approved" | "not approved";
+  status: "NOT_SUBMITTED" | "SUBMITTED"| "PROCESSING"|"VERIFIED"|"APPROVED"|"REJECTED";
 };
 
 export type Application = {
-  application_id: string;
+  uni_application_id: string;
   application_name: string;
   application_description: string;
-  application_type: string;
+  application_id: string;
   documents: ApplicationDocument[];
 };

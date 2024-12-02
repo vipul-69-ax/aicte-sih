@@ -47,7 +47,7 @@ import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
 import Institute from "../../admin/index";
 
-const typedApplicationTypes: any[] = applicationTypes;
+const typedApplicationTypes: ApplicationType[] = applicationTypes;
 
 const DashboardSkeleton: React.FC = () => (
   <div className="min-h-screen bg-background">
@@ -118,8 +118,9 @@ const DashboardSkeleton: React.FC = () => (
 );
 
 interface ApplicationType {
+  id: string;
   name: string;
-  documents: string[];
+  documents: { id: string; name: string; pdfPath: string }[];
 }
 
 interface UniversityData {
@@ -213,14 +214,14 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
 
 interface MainContentProps {
   applicationTypes: ApplicationType[];
-  selectedType: string;
-  setSelectedType: (type: string) => void;
+  selectedTypeId: string;
+  setSelectedTypeId: (type: string) => void;
   instituteId: string;
 }
 const MainContent: React.FC<MainContentProps> = ({
   applicationTypes,
-  selectedType,
-  setSelectedType,
+  selectedTypeId,
+  setSelectedTypeId,
   instituteId,
 }) => {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false);
@@ -228,21 +229,21 @@ const MainContent: React.FC<MainContentProps> = ({
   const onSubmit = async (formData: { name: string; description: string }) => {
     console.log(instituteId);
     const data: Application = {
-      application_id: `Application-${uuid4()}`,
+      uni_application_id: `Application-${uuid4()}`,
       application_description: formData.description,
       application_name: formData.name,
-      application_type: selectedType,
+      application_id: selectedTypeId,
       documents: applicationTypes
-        .find((x) => x.name === selectedType)
+        .find((x) => x.id === selectedTypeId)
         ?.documents.map((doc: any) => {
           return {
-            document_id: `Application-${uuid4()}`,
-            document_name: doc.name,
-            format_uri: doc.pdfPath,
+            uni_doc_id: `Application-${uuid4()}`,
+            uni_doc_name: doc.name,
+            doc_id: doc.id,
             errors: [],
-            user_document_uri: "",
+            uni_doc_uri: "",
             timestamp: new Date(),
-            status: "not approved",
+            status: "NOT_SUBMITTED",
           };
         }) as ApplicationDocument[],
     };
@@ -327,13 +328,16 @@ const MainContent: React.FC<MainContentProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            <Select onValueChange={setSelectedType} defaultValue={selectedType}>
+            <Select
+              onValueChange={setSelectedTypeId}
+              defaultValue={selectedTypeId}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select application type" />
               </SelectTrigger>
               <SelectContent>
                 {applicationTypes.map((type) => (
-                  <SelectItem key={type.name} value={type.name}>
+                  <SelectItem key={type.id} value={type.id}>
                     {type.name}
                   </SelectItem>
                 ))}
@@ -342,7 +346,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
             <div className="rounded-lg border border-gray-200 divide-y divide-gray-200">
               {applicationTypes
-                .find((type) => type.name === selectedType)
+                .find((type) => type.id === selectedTypeId)
                 ?.documents.map((doc: any, index) => (
                   <motion.div
                     key={doc.name}
@@ -415,7 +419,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
 export default function Dashboard() {
   const [selectedType, setSelectedType] = React.useState(
-    applicationTypes[0].name
+    applicationTypes[0].id
   );
   const { token } = useAuthStore();
   const { setInstituteId } = useInstituteStore();
@@ -448,8 +452,8 @@ export default function Dashboard() {
       <div className="flex flex-1">
         <MainContent
           applicationTypes={typedApplicationTypes}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
+          selectedTypeId={selectedType}
+          setSelectedTypeId={setSelectedType}
           instituteId={instituteData?.id}
         />
         <RightSidebar data={instituteData ? instituteData : universityData} />
