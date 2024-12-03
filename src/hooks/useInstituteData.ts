@@ -6,11 +6,12 @@ import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useAuthStore } from "./useAuth";
 
 const useInstituteData = () => {
   const { toast } = useToast();
   const nav = useNavigate();
-
+  const { clearAuth } = useAuthStore();
   const mutation = useMutation({
     mutationKey: ["institute-data"],
     mutationFn: async (instituteId: string) => {
@@ -21,7 +22,8 @@ const useInstituteData = () => {
       );
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
+ queryClient.invalidateQueries({ queryKey: ["institute-data"]});
     },
     onError: (error) => {
       toast({
@@ -29,7 +31,10 @@ const useInstituteData = () => {
         onClick: () => {
         },
       });
+      clearAuth();
+      nav("/institute/login");
       console.error("Failed to fetch institute data:", error);
+
     },
     retry:3
   });

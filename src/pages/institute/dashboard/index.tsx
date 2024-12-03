@@ -224,12 +224,14 @@ interface MainContentProps {
   selectedTypeId: string;
   setSelectedTypeId: (type: string) => void;
   instituteId: string;
+  universityName: string;
 }
 const MainContent: React.FC<MainContentProps> = ({
   applicationTypes,
   selectedTypeId,
   setSelectedTypeId,
   instituteId,
+  universityName,
 }) => {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false);
   const { mutateAsync: upload, isPending } = useApplicationUpload();
@@ -270,7 +272,7 @@ const MainContent: React.FC<MainContentProps> = ({
         className="mb-8"
       >
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Chandigarh University
+          {universityName}
         </h1>
         <p className="text-gray-600">
           Here's what's happening with your applications
@@ -443,15 +445,6 @@ export default function Dashboard() {
     setInstituteData(data.data);
     setInstituteId(data.data.id);
   };
-  const universityData: UniversityData = {
-    email: "sharmavipul01002@gmail.com",
-    state: "Punjab",
-    pincode: "140301",
-    district: "Mohali",
-    phone: "9399563226",
-    instituteType: "Private University",
-    universityName: "Chandigarh University",
-  };
 
   React.useEffect(() => {
     fetchInstituteData();
@@ -468,6 +461,7 @@ export default function Dashboard() {
           selectedTypeId={selectedType}
           setSelectedTypeId={setSelectedType}
           instituteId={instituteData?.id}
+          universityName={instituteData.universityName}
         />
         <RightSidebar data={instituteData ? instituteData : universityData} />
       </div>

@@ -33,11 +33,11 @@ import {
   Building,
   Loader2,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import AicteLogo from "@/assets/aicte-logo.webp";
 import { useOtp } from "@/hooks/useOTP";
-import {useInstituteRegistration} from "@/hooks/useAuth";
+import { useInstituteRegistration } from "@/hooks/useAuth";
 const formSchema = z.object({
   password: z
     .string()
@@ -59,6 +59,7 @@ export default function InstituteOtpForm() {
   const [serverOtp, setServerOtp] = useState("");
   const [expandedSection, setExpandedSection] = useState("basic");
   const { toast } = useToast();
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,6 +100,7 @@ export default function InstituteOtpForm() {
         toast({
           title: "Registration Success",
         });
+        navigate("/institute/dashboard");
       }
     } else {
       toast({ title: "Enter the correct OTP" });

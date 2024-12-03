@@ -243,25 +243,33 @@ const ApplicationsPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[200px]">
-                {applications.slice(0, 3).map((app) => (
-                  <div
-                    key={app.uni_application_id}
-                    className="flex items-center space-x-4 mb-4"
-                  >
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium leading-none text-[#2c3e50]">
-                        {app.application.application_name}
-                      </p>
-                      <p className="text-sm text-[#7f8c8d]">
-                        {app.uni_application_id}
-                      </p>
+              <ScrollArea className="max-h-[200px]">
+                {applications.length == 0 ? (
+                  <div className="flex h-[200px] justify-center">
+                    <div className="self-center font-semibold">
+                      No Applications Submitted
                     </div>
-                    <Badge>
-                      {getApplicationStatus(app.UniversityDocuments)}
-                    </Badge>
                   </div>
-                ))}
+                ) : (
+                  applications.slice(0, 3).map((app) => (
+                    <div
+                      key={app.uni_application_id}
+                      className="flex items-center space-x-4 mb-4"
+                    >
+                      <div className="flex-1 space-y-1">
+                        <p className="text-sm font-medium leading-none text-[#2c3e50]">
+                          {app.application.application_name}
+                        </p>
+                        <p className="text-sm text-[#7f8c8d]">
+                          {app.uni_application_id}
+                        </p>
+                      </div>
+                      <Badge>
+                        {getApplicationStatus(app.UniversityDocuments)}
+                      </Badge>
+                    </div>
+                  ))
+                )}
               </ScrollArea>
             </CardContent>
           </Card>
@@ -340,45 +348,53 @@ const ApplicationsPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[calc(100vh-24rem)] overflow-auto">
-              {filteredApplications.map((app) => (
-                <div
-                  key={app.uni_application_id}
-                  className="flex items-center justify-between p-4 bg-white rounded-lg border border-[#e0e0e0]"
-                >
-                  <div className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarFallback>
-                        {app.application.application_name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-medium text-[#2c3e50]">
-                        {app.application.application_name}
-                      </p>
-                      <p className="text-sm text-[#7f8c8d]">
-                        {app.createdOn == undefined
-                          ? ""
-                          : new Date(app.createdOn).toDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <Badge>
-                      {getApplicationStatus(app.UniversityDocuments)}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        navigate(`/institute/applications/${app.uni_application_id}
-`)
-                      }
-                    >
-                      <ChevronRight className="h-4 w-4 text-[#7f8c8d]" />
-                    </Button>
+              {filteredApplications.length == 0 ? (
+                <div className="flex justify-center">
+                  <div className="self-center font-semibold">
+                    No Applications found
                   </div>
                 </div>
-              ))}
+              ) : (
+                filteredApplications.map((app) => (
+                  <div
+                    key={app.uni_application_id}
+                    className="flex items-center justify-between p-4 bg-white rounded-lg border border-[#e0e0e0]"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <Avatar>
+                        <AvatarFallback>
+                          {app.application.application_name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium text-[#2c3e50]">
+                          {app.application.application_name}
+                        </p>
+                        <p className="text-sm text-[#7f8c8d]">
+                          {app.createdOn == undefined
+                            ? ""
+                            : new Date(app.createdOn).toDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <Badge>
+                        {getApplicationStatus(app.UniversityDocuments)}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          navigate(`/institute/applications/${app.uni_application_id}
+`)
+                        }
+                      >
+                        <ChevronRight className="h-4 w-4 text-[#7f8c8d]" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
