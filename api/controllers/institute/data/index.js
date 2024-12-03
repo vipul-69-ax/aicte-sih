@@ -15,16 +15,16 @@ const get_institute_data = async (req, res) => {
 
         // const result = await db.query(query, [instituteId]);
 
-        const result = await prisma.university.findUnique({ where: { id: instituteId } })
+        const result = await prisma.university.findUniqueOrThrow({ where: { id: instituteId } })
         res.status(200).json({
             success: true,
             data: result, // Returns an array of objects with institute_id and institute_data
         });
     } catch (error) {
         console.error("Error fetching data:", error);
-        res.status(500).json({
+        res.status(401).json({
             success: false,
-            message: "Internal server error.",
+            message: "No institute found with given institue_id.",
         });
     }
 }
@@ -54,14 +54,16 @@ const start_new_application = async (req, res) => {
         const applicationRes = await prisma.universityApplication.create({
             data: {
                 uni_application_id: application.uni_application_id, application_id: application.application_id, universityId: institute_id, UniversityDocuments: {
-                    create: application.documents
+                    create: application.UniversityDocuments
                 }
             }
         });
 
         res.status(200).json({
+            id: applicationRes.uni_application_id,
             success: true,
-            data: applicationRes
+            message: `Succesfully created ${applicationRes.uni_application_id}`,
+            token: institute_id
         });
     } catch (error) {
         console.error("Error handling data:", error);
@@ -87,8 +89,9 @@ const get_applications = async (req, res) => {
         //   `;
 
         //     const result = await db.query(query, [instituteId]);
-        const applications = await prisma.universityApplication.findMany({ where: { universityId: instituteId } });
-
+        const applications = await prisma.universityApplication.findMany({ orderBy: { createdOn: "desc" }, where: { universityId: instituteId }, include: { UniversityDocuments: true, application: true } });
+        applications.documents = applications.UniversityDocuments;
+        delete applications.UniversityDocuments;
         if (!applications) {
             return res.status(404).json({ error: "No applications found for this institute" });
         }
@@ -124,9 +127,9 @@ const get_application_document_by_id = async (req, res) => {
         //     const values = [institute_id, application_id];
 
         //     const result = await db.query(query, values);
-        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id } });
+        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id }, include: { application: true, UniversityDocuments: { include: { document: true } }, } });
 
-        if (result.rows.length === 0) {
+        if (!documents) {
             return res.status(404).json({ error: "No application found with the given Application ID for the given instituteID." });
         }
 

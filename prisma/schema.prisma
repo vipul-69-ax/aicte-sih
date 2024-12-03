@@ -66,6 +66,7 @@ model UniversityApplication {
   uni_application_id  String                @id @default(uuid())
   application_id      String
   messages            Json?
+  createdOn           DateTime              @default(now())
   universityId        String
   university          University            @relation(fields: [universityId], references: [id])
   status              DocumentStatus        @default(NOT_SUBMITTED)
