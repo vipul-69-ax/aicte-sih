@@ -39,13 +39,18 @@ import {
 import applicationTypes from "@/data/applicationTypes.json";
 import { PDFViewer } from "@/components/PdfViewer";
 import { ApplicationSubmissionForm } from "@/components/ApplicationSubmissionForm";
-import { Application, ApplicationDocument } from "@/schemas/applicationSchema";
+import {
+  SubmitUniversityApplication,
+  SubmitApplicationDocument,
+} from "@/schemas/applicationSchema";
 import { v4 as uuid4 } from "uuid";
 import { useInstituteData, useInstituteStore } from "@/hooks/useInstituteData";
 import { useAuthStore } from "@/hooks/useAuth";
 import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
 import Institute from "../../admin/index";
+import Settings from "../settings";
+import { useNavigate } from "react-router-dom";
 
 const typedApplicationTypes: ApplicationType[] = applicationTypes;
 
@@ -139,6 +144,8 @@ interface RightSidebarProps {
 
 const RightSidebar: React.FC<RightSidebarProps> = ({ data }) => (
   <div className="w-80 bg-white h-screen sticky right-0 top-0 border-l border-gray-200">
+    {/* FIXME just for logging out need to modify */}
+    <Settings />
     <ScrollArea className="h-screen px-6 py-8">
       <div className="flex flex-col items-center mb-8">
         <Avatar className="w-24 h-24 mb-4">
@@ -226,14 +233,15 @@ const MainContent: React.FC<MainContentProps> = ({
 }) => {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = React.useState(false);
   const { mutateAsync: upload, isPending } = useApplicationUpload();
+  const navigate = useNavigate();
   const onSubmit = async (formData: { name: string; description: string }) => {
     console.log(instituteId);
-    const data: Application = {
+    const data: SubmitUniversityApplication = {
       uni_application_id: `Application-${uuid4()}`,
       application_description: formData.description,
       application_name: formData.name,
       application_id: selectedTypeId,
-      documents: applicationTypes
+      UniversityDocuments: applicationTypes
         .find((x) => x.id === selectedTypeId)
         ?.documents.map((doc: any) => {
           return {
@@ -245,7 +253,7 @@ const MainContent: React.FC<MainContentProps> = ({
             timestamp: new Date(),
             status: "NOT_SUBMITTED",
           };
-        }) as ApplicationDocument[],
+        }) as SubmitApplicationDocument[],
     };
     await upload({
       application: data,
@@ -298,7 +306,12 @@ const MainContent: React.FC<MainContentProps> = ({
             whileHover={{ scale: 1.03 }}
             className="relative overflow-hidden rounded-lg"
           >
-            <Card className="bg-white shadow-sm h-48">
+            <Card
+              className="bg-white shadow-sm h-48"
+              onClick={() => {
+                navigate("/institute/applications");
+              }}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-semibold text-gray-800">
                   {item.title}

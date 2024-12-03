@@ -4,7 +4,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { SERVER_URL } from "@/constants/API";
-import { Application } from "@/schemas/applicationSchema";
+import { SubmitUniversityApplication, UniversityApplication} from "@/schemas/applicationSchema";
 import { useInstituteStore } from "./useInstituteData";
 
 // Assuming you have an auth store, if not, you can remove this import and related code
@@ -21,7 +21,7 @@ interface ApplicationUploadResponse {
 export const useApplicationUpload = (): UseMutationResult<
   ApplicationUploadResponse,
   Error,
-  { application: Application; institute_id: string }
+  { application: SubmitUniversityApplication; institute_id: string }
 > => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export const useApplicationUpload = (): UseMutationResult<
   return useMutation({
     mutationKey: ["application-upload"],
     mutationFn: async (formData: {
-      application: Application;
+  application: SubmitUniversityApplication;
       institute_id: string;
     }) => {
       const res = await axios.post<ApplicationUploadResponse>(
@@ -49,7 +49,7 @@ export const useApplicationUpload = (): UseMutationResult<
       });
 
       // Navigate to a success page or dashboard
-
+      navigate(`/institute/applications/${data.id}`)
       console.log("Application upload successful:", data);
     },
     onError: (error: Error) => {
@@ -67,8 +67,8 @@ export const useApplicationUpload = (): UseMutationResult<
 };
 
 interface ApplicationGetResponse {
-  applications: Application[];
-  data: Application[];
+  applications: UniversityApplication[];
+  data: UniversityApplication[];
   status: "success" | "error";
   message: string;
 }

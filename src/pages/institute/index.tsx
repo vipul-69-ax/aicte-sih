@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/hooks/useAuth'
-import { CollapsibleSidebar } from '@/components/CollapisbleSidebar'
-import { motion } from 'framer-motion'
-import { Chatbot } from '@/components/Chatbot'
-import { Button } from '@/components/ui/button'
-import { MessageCircle } from 'lucide-react'
+import React, { useEffect, useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/hooks/useAuth";
+import { CollapsibleSidebar } from "@/components/CollapisbleSidebar";
+import { motion } from "framer-motion";
+import { Chatbot } from "@/components/Chatbot";
+import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 
 const Institute: React.FC = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { token, mode } = useAuthStore()
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const navigate = useNavigate();
+  const { token, mode } = useAuthStore();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isChatOpen, setIsChatOpen] = React.useState(false);
-  const { pathname } = useLocation()
+  const { pathname } = useLocation();
   useEffect(() => {
-    if (!token || mode !== 'institute') {
-      navigate('/institute/login')
+    if (!token || mode !== "institute") {
+      navigate("/institute/login");
     }
-  }, [token, mode, navigate])
+  }, [token, mode, navigate]);
 
   return (
     <div className="flex bg-background min-h-screen">
-      {pathname !== "/institute/login" && <CollapsibleSidebar onCollapse={setIsCollapsed} />}
+      {pathname !== "/institute/login" && (
+        <CollapsibleSidebar onCollapse={setIsCollapsed} />
+      )}
       <motion.main
         className="flex-1 p-8"
         animate={{
-          marginLeft: pathname == "/institute/login" ? 0 : isCollapsed ? "2rem" : "16rem",
+          marginLeft:
+            pathname == "/institute/login" ? 0 : isCollapsed ? "2rem" : "16rem",
         }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
@@ -48,8 +50,7 @@ const Institute: React.FC = () => {
       </motion.div>
       <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
-  )
-}
+  );
+};
 
-export default Institute
-
+export default Institute;

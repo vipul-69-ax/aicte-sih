@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Link, useNavigate } from "react-router-dom"
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FileCheck,
   Users,
@@ -16,20 +15,20 @@ import {
   Mail,
   MapPin,
   ChevronRight,
-} from "lucide-react"
-import AicteImage from '@/assets/aicte-graphic.png'
+} from "lucide-react";
+import AicteImage from "@/assets/aicte-graphic.png";
 export default function Component() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { 
+    visible: {
+      opacity: 1,
+      transition: {
         staggerChildren: 0.1,
         delayChildren: 0.3,
-      } 
+      },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -42,16 +41,40 @@ export default function Component() {
         damping: 15,
       },
     },
-  }
+  };
 
   const features = [
-    { title: "Automated Approvals", icon: FileCheck, description: "Expedite the approval process with our automated system." },
-    { title: "Transparent Evaluation", icon: Users, description: "Ensure fairness and clarity in the evaluation process." },
-    { title: "Real-time Tracking", icon: BarChart, description: "Monitor application status with detailed progress updates." },
-    { title: "Secure Documents", icon: Lock, description: "State-of-the-art encryption for document protection." },
-    { title: "Easy Submission", icon: FileText, description: "Submit documents through our user-friendly interface." },
-    { title: "Detailed Reports", icon: Search, description: "Generate insights into your approval process." },
-  ]
+    {
+      title: "Automated Approvals",
+      icon: FileCheck,
+      description: "Expedite the approval process with our automated system.",
+    },
+    {
+      title: "Transparent Evaluation",
+      icon: Users,
+      description: "Ensure fairness and clarity in the evaluation process.",
+    },
+    {
+      title: "Real-time Tracking",
+      icon: BarChart,
+      description: "Monitor application status with detailed progress updates.",
+    },
+    {
+      title: "Secure Documents",
+      icon: Lock,
+      description: "State-of-the-art encryption for document protection.",
+    },
+    {
+      title: "Easy Submission",
+      icon: FileText,
+      description: "Submit documents through our user-friendly interface.",
+    },
+    {
+      title: "Detailed Reports",
+      icon: Search,
+      description: "Generate insights into your approval process.",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -59,13 +82,19 @@ export default function Component() {
         <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="text-xl font-bold text-blue-600">AICTE Portal</div>
           <div className="flex items-center gap-8">
-            
-            <Button onClick={()=>{
-              navigate("/institute/login")
-            }} variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
+            <Button
+              onClick={() => {
+                navigate("/institute/login");
+              }}
+              variant="outline"
+              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+            >
               Institute Login
             </Button>
-            <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
+            <Button
+              variant="outline"
+              className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+            >
               Evaluator Login
             </Button>
           </div>
@@ -82,19 +111,21 @@ export default function Component() {
                 variants={containerVariants}
                 className="space-y-6"
               >
-                <motion.h1 
+                <motion.h1
                   className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-gray-900"
                   variants={itemVariants}
                 >
-                  AICTE Institute Approval Platform 
+                  AICTE Institute Approval Platform
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   className="text-xl text-gray-600 max-w-xl"
                   variants={itemVariants}
                 >
-                  A streamlined digital platform for managing technical education approvals, built for the future of education in India.
+                  A streamlined digital platform for managing technical
+                  education approvals, built for the future of education in
+                  India.
                 </motion.p>
-                <motion.div 
+                <motion.div
                   className="flex items-center gap-4"
                   variants={itemVariants}
                 >
@@ -102,7 +133,10 @@ export default function Component() {
                     Get Started
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Button>
-                  <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 h-12 text-lg">
+                  <Button
+                    variant="outline"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 h-12 text-lg"
+                  >
                     Learn More
                   </Button>
                 </motion.div>
@@ -169,19 +203,20 @@ export default function Component() {
               variants={containerVariants}
               className="max-w-2xl mx-auto space-y-12"
             >
-              <motion.h2 
+              <motion.h2
                 className="text-4xl font-bold text-gray-900"
                 variants={itemVariants}
               >
                 Ready to Get Started?
               </motion.h2>
-              <motion.p 
+              <motion.p
                 className="text-gray-600 text-lg"
                 variants={itemVariants}
               >
-                Join thousands of institutions already using our platform to streamline their approval process.
+                Join thousands of institutions already using our platform to
+                streamline their approval process.
               </motion.p>
-              <motion.div 
+              <motion.div
                 className="flex flex-wrap justify-center gap-4"
                 variants={itemVariants}
               >
@@ -220,32 +255,49 @@ export default function Component() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>Nelson Mandela Marg, Vasant Kunj, New Delhi-110070</span>
+                  <span>
+                    Nelson Mandela Marg, Vasant Kunj, New Delhi-110070
+                  </span>
                 </div>
               </div>
             </div>
             <div>
               <h3 className="font-bold text-lg mb-4">Quick Links</h3>
               <div className="space-y-3">
-                <Link to="#" className="block text-gray-300 hover:text-white">About AICTE</Link>
-                <Link to="#" className="block text-gray-300 hover:text-white">Regulations</Link>
-                <Link to="#" className="block text-gray-300 hover:text-white">Resources</Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  About AICTE
+                </Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  Regulations
+                </Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  Resources
+                </Link>
               </div>
             </div>
             <div>
               <h3 className="font-bold text-lg mb-4">Legal</h3>
               <div className="space-y-3">
-                <Link to="#" className="block text-gray-300 hover:text-white">Privacy Policy</Link>
-                <Link to="#" className="block text-gray-300 hover:text-white">Terms of Service</Link>
-                <Link to="#" className="block text-gray-300 hover:text-white">Disclaimer</Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  Privacy Policy
+                </Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  Terms of Service
+                </Link>
+                <Link to="#" className="block text-gray-300 hover:text-white">
+                  Disclaimer
+                </Link>
               </div>
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} All India Council for Technical Education. All rights reserved.</p>
+            <p>
+              © {new Date().getFullYear()} All India Council for Technical
+              Education. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
