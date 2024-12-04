@@ -385,8 +385,9 @@ const ApplicationsPage: React.FC = () => {
                         variant="ghost"
                         size="icon"
                         onClick={() =>
-                          navigate(`/institute/applications/${app.uni_application_id}
-`)
+                          navigate(
+                            `/institute/applications/${app.uni_application_id}`
+                          )
                         }
                       >
                         <ChevronRight className="h-4 w-4 text-[#7f8c8d]" />

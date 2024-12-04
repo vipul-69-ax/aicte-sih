@@ -1,14 +1,12 @@
-import { SERVER_URL } from "@/constants/API";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { useToast } from "./use-toast";
+import { api } from "@/lib/utils";import { useToast } from "./use-toast";
 import { queryClient } from "@/App";
 
 export const useOtp = () => {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async (formData: { email: string }) => {
-      const res = await axios.post(`${SERVER_URL}/otp`, formData);
+      const res = await api.post(`/otp`, formData);
       return res.data;
     },
     mutationKey: ["otp"],

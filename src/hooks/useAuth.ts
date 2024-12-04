@@ -1,8 +1,6 @@
 import { queryClient } from "@/App";
-import { SERVER_URL } from "@/constants/API";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { useToast } from "./use-toast";
+import { api } from "@/lib/utils";import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 
 interface InstituteRegistrationData {
@@ -17,8 +15,8 @@ const useInstituteRegistration = () => {
   const mutation = useMutation({
     mutationKey: ["institute-register"],
     mutationFn: async (formData: InstituteRegistrationData) => {
-      const res = await axios.post(
-        `${SERVER_URL}/institute/auth/register`,
+      const res = await api.post(
+        `/institute/auth/register`,
         formData
       );
       return res.data;
@@ -48,8 +46,8 @@ const useInstituteExists = () => {
   const mutation = useMutation({
     mutationKey: ["institute-check"],
     mutationFn: async (formData: { authKey: string }) => {
-      const res = await axios.post(
-        `${SERVER_URL}/institute/auth/institute_exists`,
+      const res = await api.post(
+        `/institute/auth/institute_exists`,
         formData
       );
       return res.data;
@@ -77,8 +75,8 @@ const useInstituteLogin = () => {
   const mutation = useMutation({
     mutationKey: ["institute-login"],
     mutationFn: async (formData: InstituteLoginData) => {
-      const res = await axios.post(
-        `${SERVER_URL}/institute/auth/login`,
+      const res = await api.post(
+        `/institute/auth/login`,
         formData
       );
       return res.data;
@@ -125,8 +123,8 @@ const useInstituteForgotPassword = () => {
   const mutation = useMutation({
     mutationKey: ["institute-fp"],
     mutationFn: async (formData: InstituteLoginData) => {
-      const res = await axios.post(
-        `${SERVER_URL}/institute/auth/forgot`,
+      const res = await api.post(
+        `/institute/auth/forgot`,
         formData
       );
       return res.data;

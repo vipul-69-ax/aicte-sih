@@ -1,8 +1,6 @@
 import { queryClient } from "@/App";
-import { SERVER_URL } from "@/constants/API";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { useToast } from "./use-toast";
+import { api } from "@/lib/utils";import { useToast } from "./use-toast";
 import { useNavigate } from "react-router-dom";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -15,8 +13,8 @@ const useInstituteData = () => {
   const mutation = useMutation({
     mutationKey: ["institute-data"],
     mutationFn: async (instituteId: string) => {
-      const res = await axios.post(
-        `${SERVER_URL}/institute/data`,{
+      const res = await api.post(
+        `/institute/data`,{
           instituteId
         }
       );

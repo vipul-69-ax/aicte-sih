@@ -1,12 +1,9 @@
 import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/utils";import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { SERVER_URL } from "@/constants/API";
 import { SubmitUniversityApplication, UniversityApplication} from "@/schemas/applicationSchema";
 import { useInstituteStore } from "./useInstituteData";
-
 // Assuming you have an auth store, if not, you can remove this import and related code
 
 // Update this to match your server URL
@@ -33,8 +30,8 @@ export const useApplicationUpload = (): UseMutationResult<
   application: SubmitUniversityApplication;
       institute_id: string;
     }) => {
-      const res = await axios.post<ApplicationUploadResponse>(
-        `${SERVER_URL}/institute/data/new_application`,
+      const res = await api.post<ApplicationUploadResponse>(
+        `/institute/data/new_application`,
         formData
       );
       return res.data;
@@ -85,8 +82,8 @@ export const useApplicationGet = (): UseMutationResult<
   return useMutation({
     mutationKey: ["get-applications"],
     mutationFn: async (instituteId: string) => {
-      const res = await axios.get<ApplicationGetResponse>(
-        `${SERVER_URL}/institute/data/get_applications?id=${instituteId}`
+      const res = await api.get<ApplicationGetResponse>(
+        `/institute/data/get_applications?id=${instituteId}`
       );
       return res.data;
     },
@@ -117,8 +114,8 @@ export const useDocumentGet = () => {
   return useMutation({
     mutationKey: ["get-documents"],
     mutationFn: async (id: string) => {
-      const res = await axios.get(
-        `${SERVER_URL}/institute/data/get_documents?application_id=${id}&institute_id=${instituteId}`
+      const res = await api.get(
+        `/institute/data/get_documents?application_id=${id}&institute_id=${instituteId}`
       );
       return res.data;
     },

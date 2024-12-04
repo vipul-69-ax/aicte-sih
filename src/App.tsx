@@ -13,12 +13,13 @@ import ForgotPasswordPage from "./pages/institute/auth/forgot";
 import ApplicationData from "./pages/institute/applications/Application";
 import Settings from "./pages/institute/settings";
 import InstituteOtpForm from "./pages/institute/auth/otp";
+import { api } from "./lib/utils";
 
 export const queryClient = new QueryClient();
 
 export default function App() {
   const { token, mode } = useAuthStore();
-
+  api.defaults.headers.Authorization = token;
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
