@@ -20,14 +20,17 @@ const getOtpEmailTemplate = (otp) => `
 `;
 
 const sendOtpEmail = async (req, res) => {
-    let { email } = req.body;
-    let t = await checkEmailForInstitute(email)
-    if(t){
-        email = t
+    let { email, user_type, } = req.body;
+    if (user_type) {
+        let t = await checkEmailForInstitute(email, user_type);
+        if (t) {
+            email = t
+        }
+        else email = undefined;
     }
     console.log(email)
     if (!email) {
-        return res.status(400).json({ success: false, message: 'Email is required' });
+        return res.status(400).json({ success: false, message: 'Email is required or No accounts found.' });
     }
 
     const otp = generateOTP();

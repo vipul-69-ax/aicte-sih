@@ -3,6 +3,8 @@ const cors = require("cors")
 const { createProxyMiddleware } = require('http-proxy-middleware')
 const InstitueRouter = require("./routes/institute")
 const { sendOtpEmail } = require("./controllers/otp")
+const { actionLogger } = require("./services/logging")
+const prisma = require("./utils/db")
 
 const app = express()
 
@@ -22,6 +24,13 @@ app.use('/api/chat', createProxyMiddleware({
   },
 }))
 
+async function cleanup() {
+  await actionLogger.pushToDB().then(() => { console.log("Logged Pushed to the DB.") });
+  await prisma.$disconnect().then(() => { console.log("Closed Database Connection.") });
+  process.exit(0);
+}
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Express server running on port ${PORT}`)

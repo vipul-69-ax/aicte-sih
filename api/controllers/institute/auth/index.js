@@ -105,7 +105,7 @@ const checkInstituteId = async (req, res) => {
   }
 };
 
-const checkEmailForInstitute = async (institute_id) => {
+const checkEmailForInstitute = async (id, entity) => {
   try {
     // const query = `
     //   SELECT institute_data->'universityDetails'->>'email' AS email
@@ -115,6 +115,19 @@ const checkEmailForInstitute = async (institute_id) => {
     // const result = await pool.query(query, [institute_id]);
     // return result.rows[0].email
     // prisma.
+    let email;
+    if (entity == "university") {
+      const emailRes = await prisma.university.findUnique({ where: { email: id }, select: { email: true } });
+      email = emailRes.email;
+    }
+    if (entity == "evaluator") {
+      const emailRes = await prisma.evaluator.findUnique({ where: { email: id }, select: { email: true } });
+      email = emailRes.email;
+    }
+    if (email) {
+      return email;
+    }
+    return undefined;
   }
   catch (err) {
     return undefined
