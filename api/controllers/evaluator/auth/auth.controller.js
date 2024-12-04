@@ -2,7 +2,7 @@ const argon2 = require("argon2");
 const { z } = require("zod");
 const prisma = require("../../../utils/db");
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET ?? 'holaa';
+const { JWT_SECRET } = require("../../../middlewares/auth");
 const EvaluatorSchema = z.object({
   evaluator_id: z.string().uuid().optional(), // UUID, typically generated automatically
   email: z.string().email(),                  // Valid email address
@@ -24,6 +24,7 @@ const evaluatorRegister = async (req, res) => {
   data.password = hashedPassword;
   try {
     const dbEvaluatorRes = await prisma.evaluator.create({ data: data });
+    return res.status(200).json({ message: "Evaluator has been created.", evaluator_id: dbEvaluatorRes.evaluator_id })
   }
   catch (err) {
     console.log("evaluation Registration failed", err);
@@ -40,11 +41,11 @@ const evaluatorLogin = async (req, res) => {
     if (!evaluator) {
       return res.status(400).json({ errors: "No institution found with given authkey." })
     }
-    const verified = argon2.verify(evaluator.password, password);
+    const verified = await argon2.verify(evaluator.password, password);
     if (!verified) {
       throw new Error("Not authorized");
     }
-    const token = jwt.sign({ evaluator_id: evaluator.evaluator_id, role: evaluator.role });
+    const token = jwt.sign({ evaluator_id: evaluator.evaluator_id, role: evaluator.role }, JWT_SECRET);
     return res.status(200).json(token);
   }
   catch (err) {

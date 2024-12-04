@@ -1,6 +1,7 @@
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+const jwt = require("jsonwebtoken");
+const { JsonWebTokenError } = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET ?? 'holaa';
-const evaluatorAuth = (req, res) => {
+const authJWT = (req, res, next) => {
     try {
         const token = req.headers.authorization;
         if (!token) {
@@ -15,3 +16,5 @@ const evaluatorAuth = (req, res) => {
         return res.status(401).json({ error: "not authorized." }); s
     }
 }
+
+module.exports = { authJWT, JWT_SECRET };

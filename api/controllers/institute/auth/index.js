@@ -2,7 +2,8 @@ const { v4: uuid } = require("uuid");
 const argon2 = require("argon2");
 const { verifyUniversity } = require("../../../services/university_validation");
 const prisma = require("../../../utils/db");
-
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../../../middlewares/auth");
 async function institute_register(req, res) {
   const { institute_id, institute_data, password } = req.body;
 
@@ -174,11 +175,11 @@ const loginInstitute = async (req, res) => {
         message: "Invalid password.",
       });
     }
-
+    const token = jwt.sign({ institute_id: result.id }, JWT_SECRET, { expiresIn: "2h" });
     return res.status(200).json({
       success: true,
       message: "Login successful.",
-      token: result.id
+      token: token,
     });
   } catch (error) {
     console.error("Error during institute login:", error);

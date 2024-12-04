@@ -84,8 +84,8 @@ model University {
 
 model Evaluator {
   evaluator_id         String                  @id @default(uuid())
-  email                String
-  phone                String
+  email                String                  @unique
+  phone                String                  @unique
   password             String
   state                String
   district             String

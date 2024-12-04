@@ -1,21 +1,29 @@
 const prisma = require("../../../utils/db");
 
 const availableApplication = async (req, res) => {
-    const application = await prisma.applicationTypes.findMany({ include: { documents: true } });
-    return res.json({ data: application });
+    try {
+
+        const application = await prisma.applicationTypes.findMany({ include: { documents: true } });
+        return res.json({ data: application });
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ errors: "Internal Server Error." });
+    }
+
 }
 
 const get_institute_data = async (req, res) => {
-    const { instituteId } = req.body
+    const { institute_id } = req.authData;
     try {
         // const query = `
         //   SELECT institute_id, institute_data
         //   FROM institute WHERE id = $1; 
         // `;
 
-        // const result = await db.query(query, [instituteId]);
+        // const result = await db.query(query, [institute_id]);
 
-        const result = await prisma.university.findUniqueOrThrow({ where: { id: instituteId } })
+        const result = await prisma.university.findUniqueOrThrow({ where: { id: institute_id } })
         res.status(200).json({
             success: true,
             data: result, // Returns an array of objects with institute_id and institute_data
@@ -30,7 +38,8 @@ const get_institute_data = async (req, res) => {
 }
 
 const start_new_application = async (req, res) => {
-    const { institute_id, application } = req.body;
+    const { application } = req.body;
+    const { institute_id } = req.authData;
     if (!institute_id || typeof application !== "object") {
         return res.status(400).json({
             success: false,
@@ -75,9 +84,9 @@ const start_new_application = async (req, res) => {
 }
 
 const get_applications = async (req, res) => {
-    const instituteId = req.query.id;
-    console.log(instituteId)
-    if (!instituteId) {
+    const { institute_id } = req.authData;
+    console.log(institute_id)
+    if (!institute_id) {
         return res.status(400).json({ error: "Institute ID is required" });
     }
 
@@ -88,8 +97,8 @@ const get_applications = async (req, res) => {
         //     WHERE institute_id = $1;
         //   `;
 
-        //     const result = await db.query(query, [instituteId]);
-        const applications = await prisma.universityApplication.findMany({ orderBy: { createdOn: "desc" }, where: { universityId: instituteId }, include: { UniversityDocuments: true, application: true } });
+        //     const result = await db.query(query, [institute_id]);
+        const applications = await prisma.universityApplication.findMany({ orderBy: { createdOn: "desc" }, where: { universityId: institute_id }, include: { UniversityDocuments: true, application: true } });
         applications.documents = applications.UniversityDocuments;
         delete applications.UniversityDocuments;
         if (!applications) {
@@ -107,7 +116,8 @@ const get_applications = async (req, res) => {
 }
 
 const get_application_document_by_id = async (req, res) => {
-    const { institute_id, application_id } = req.query;
+    const { application_id } = req.query;
+    const { institute_id } = req.authData;
     console.log(institute_id, application_id)
     if (!institute_id || !application_id) {
         return res.status(400).json({ error: "Institute ID and Application ID are required" });
@@ -142,5 +152,6 @@ const get_application_document_by_id = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
+
 
 module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication }
