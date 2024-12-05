@@ -158,7 +158,7 @@ export default function LoginPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-[#2c3e50]">
-                          Email/Phone No
+                          University Email
                         </FormLabel>
                         <FormControl>
                           <div className="relative">

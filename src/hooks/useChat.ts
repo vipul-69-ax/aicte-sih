@@ -14,7 +14,7 @@ interface ChatHookResult {
   sendMessage: (content: string) => void
 }
 
-const SOCKET_URL = 'ws://localhost:8000/chat'
+const SOCKET_URL = 'ws://127.0.0.1:8000/chatbot'
 
 export function useChat(): ChatHookResult {
   const [socket, setSocket] = useState<WebSocket | null>(null)

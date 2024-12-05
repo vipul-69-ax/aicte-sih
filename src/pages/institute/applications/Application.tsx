@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDocumentGet } from "@/hooks/useApplication";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -203,6 +203,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [filter, setFilter] = useState("");
+  const {id:application_id} = useParams()
 
   const sortedAndFilteredDocuments = documents.UniversityDocuments.filter(
     (doc) => doc.uni_doc_name.toLowerCase().includes(filter.toLowerCase())
@@ -224,10 +225,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
     }
   };
 
-  const handleUpload = async (documentId: string, file: File) => {
-    // TODO: Implement actual file upload logic
-    console.log(`Uploading file for document ${documentId}:`, file.name);
-  };
+  const navigate = useNavigate()
 
   return (
     <div className="space-y-4 bg-white p-6 rounded-lg shadow-sm">
@@ -268,41 +266,20 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
               </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={()=>{
+                          navigate("/institute/upload-document",{state:{
+                            application_id,
+                            doc
+                          }})
+                        }}
                         className="text-[#3498db] border-[#3498db] hover:bg-[#3498db] hover:text-white"
                       >
                         <Upload className="w-4 h-4 mr-2" />
                         Upload
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Upload Document</DialogTitle>
-                        <DialogDescription>
-                          Upload a file for {doc.uni_doc_name}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor={`file-upload-${doc.doc_id}`}>
-                          File
-                        </Label>
-                        <Input
-                          id={`file-upload-${doc.doc_id}`}
-                          type="file"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleUpload(doc.doc_id, file);
-                            }
-                          }}
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button

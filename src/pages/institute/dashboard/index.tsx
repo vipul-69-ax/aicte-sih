@@ -27,6 +27,7 @@ import {
   Phone,
   MapPin,
   BookOpen,
+  MessageCircle,
 } from "lucide-react";
 import {
   Dialog,
@@ -48,9 +49,10 @@ import { useInstituteData, useInstituteStore } from "@/hooks/useInstituteData";
 import { useAuthStore } from "@/hooks/useAuth";
 import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
-import Institute from "../../admin/index";
 import Settings from "../settings";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { CollapsibleSidebar } from "@/components/CollapisbleSidebar";
+import { Chatbot } from "@/components/Chatbot";
 
 const typedApplicationTypes: ApplicationType[] = applicationTypes;
 
@@ -436,6 +438,10 @@ export default function Dashboard() {
   const [selectedType, setSelectedType] = React.useState(
     applicationTypes[0].id
   );
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const { pathname } = useLocation();
+  const [isChatOpen, setIsChatOpen] = React.useState(false);
+
   const { token } = useAuthStore();
   const { setInstituteId } = useInstituteStore();
   const { mutateAsync: getInstituteData } = useInstituteData();
@@ -445,6 +451,7 @@ export default function Dashboard() {
     setInstituteData(data.data);
     setInstituteId(data.data.id);
   };
+  
 
   React.useEffect(() => {
     fetchInstituteData();
@@ -454,7 +461,18 @@ export default function Dashboard() {
     return <DashboardSkeleton />;
   }
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
+      {pathname !== "/institute/login" && (
+        <CollapsibleSidebar onCollapse={setIsCollapsed} />
+      )}
+      <motion.main
+        className="p-8 w-full"
+        animate={{
+          marginLeft:
+            pathname == "/institute/login" ? 0 : isCollapsed ? "2rem" : "16rem",
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
       <div className="flex flex-1">
         <MainContent
           applicationTypes={typedApplicationTypes}
@@ -463,8 +481,21 @@ export default function Dashboard() {
           instituteId={instituteData?.id}
           universityName={instituteData.universityName}
         />
-        <RightSidebar data={instituteData ? instituteData : universityData} />
       </div>
+      </motion.main>
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        className="fixed bottom-12 right-[40px]"
+      >
+        <Button
+          size="icon"
+          className="h-12 w-12 rounded-full"
+          onClick={() => setIsChatOpen(!isChatOpen)}
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
+      </motion.div>
+      <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }
