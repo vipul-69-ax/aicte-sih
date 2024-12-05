@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const prisma = require("../../../utils/db");
 
 const availableApplication = async (req, res) => {
@@ -154,4 +155,30 @@ const get_application_document_by_id = async (req, res) => {
 }
 
 
-module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication }
+const document_analysis = async (req, res) => {
+    const FASTAPIURL = "http://localhost:8000";
+
+    try {
+        const response = await axios.post(`${FASTAPIURL}/chat/comparison`, {
+            template_url: req.body.formatId,
+            filled_url: req.body.fileUrl
+        });
+
+        // Sending the response back to the client with the data
+        res.status(200).json({
+            success: true,
+            data: response.data,
+        });
+    } catch (error) {
+        console.error("Error in document_analysis:", error.message);
+
+        // Responding with an appropriate error message and status code
+        res.status(error.response?.status || 500).json({
+            success: false,
+            message: error.response?.data?.detail || "An error occurred while processing the request.",
+        });
+    }
+};
+
+
+module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication, document_analysis }
