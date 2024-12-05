@@ -1,3 +1,5 @@
+const { LogAction, Doer, LogObject } = require("../../../services/enums");
+const { actionLogger, Log } = require("../../../services/logging");
 const prisma = require("../../../utils/db");
 
 const allowedStatusActions = ['IN_REVIEW', 'APPROVED', 'REJECTED'];
@@ -18,8 +20,23 @@ const getAssignedDocuments = async (req, res) => {
     }
 }
 
+const getAssignedDocumentById = async (req, res) => {
+    const { evaluator_id } = req.authData;
+    const { uni_doc_id } = req.params;
+    try {
+        const uniDoc = await prisma.universityDocuments.findUniqueOrThrow({ where: { uni_doc_id: uni_doc_id }, include: { document: { include: { application_type: true } } } });
+        actionLogger.log(new Log(Date.now(), undefined, uni_doc_id, evaluator_id, LogAction.DOC_VIEWED, Doer.EVALUATOR, LogObject.DOCUMENT));
+        return res.status(200).json({ data: uniDoc });
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(400).json({ errors: "Document not found." });
+    }
+}
+
 const actionOnAssignedDocuments = async (req, res) => {
     const { uni_doc_id, messages, status } = req.body;
+    const { evaluator_id } = req.authData;
     if (!allowedStatusActions.includes(status)) {
         return res.status(401).json({ errors: "You are not allowed to perform this actions." });
     }
@@ -35,6 +52,7 @@ const actionOnAssignedDocuments = async (req, res) => {
     }
     try {
         const updateDoc = await prisma.universityDocuments.update({ where: { evaluator_id: evaluator_id } }, { data: data });
+        actionLogger.log(new Log(Date.now(), undefined, uni_doc_id, evaluator_id, status, Doer.EVALUATOR, LogObject.DOCUMENT));
         return res.status(200).json({ data: updateDoc, message: "Document Updated Successfully." })
     }
     catch (err) {

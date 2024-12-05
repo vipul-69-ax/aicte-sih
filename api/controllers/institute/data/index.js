@@ -1,4 +1,6 @@
 const { default: axios } = require("axios");
+const { LogAction, Doer, LogObject } = require("../../../services/enums");
+const { actionLogger, Log } = require("../../../services/logging");
 const prisma = require("../../../utils/db");
 
 const availableApplication = async (req, res) => {
@@ -68,7 +70,7 @@ const start_new_application = async (req, res) => {
                 }
             }
         });
-
+        actionLogger.log(new Log(Date.now(), applicationRes.uni_application_id, undefined, undefined, LogAction.APP_CREATED, Doer.UNIVERSITY, LogObject.APPLICATION));
         res.status(200).json({
             id: applicationRes.uni_application_id,
             success: true,
