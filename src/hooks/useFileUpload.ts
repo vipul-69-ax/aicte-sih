@@ -1,5 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import {createClient} from '@supabase/supabase-js'
+import axios from 'axios'
+import { SERVER_URL } from '@/constants/API'
+import { api } from '@/lib/utils'
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -32,3 +35,22 @@ export function useFileUpload() {
   })
 }
 
+type VerifyBody = {
+    fileUrl:string,
+    formatId:string
+}
+
+export function useFileVerification(){
+    return useMutation({
+        mutationFn:async(verifyBody:VerifyBody)=>{
+            const req = await api.post(`${SERVER_URL}/institute/data/document_analysis`,verifyBody)
+            console.log(req.data)
+            return req.data
+        },
+        onSuccess:(data)=>{
+        },
+        onError:(err)=>{
+            alert(JSON.stringify(err.message))
+        }
+    })
+}

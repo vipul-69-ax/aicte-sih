@@ -51,8 +51,6 @@ import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
 import Settings from "../settings";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CollapsibleSidebar } from "@/components/CollapisbleSidebar";
-import { Chatbot } from "@/components/Chatbot";
 
 const typedApplicationTypes: ApplicationType[] = applicationTypes;
 
@@ -239,7 +237,7 @@ const MainContent: React.FC<MainContentProps> = ({
   const { mutateAsync: upload, isPending } = useApplicationUpload();
   const navigate = useNavigate();
   const onSubmit = async (formData: { name: string; description: string }) => {
-    console.log(instituteId);
+    alert(formData.name);
     const data: SubmitUniversityApplication = {
       uni_application_id: `Application-${uuid4()}`,
       application_description: formData.description,
@@ -253,7 +251,7 @@ const MainContent: React.FC<MainContentProps> = ({
             uni_doc_name: doc.name,
             doc_id: doc.id,
             errors: [],
-            uni_doc_uri: "",
+            uni_doc_uri: doc.pdfPath,
             timestamp: new Date(),
             status: "NOT_SUBMITTED",
           };
@@ -462,17 +460,6 @@ export default function Dashboard() {
   }
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {pathname !== "/institute/login" && (
-        <CollapsibleSidebar onCollapse={setIsCollapsed} />
-      )}
-      <motion.main
-        className="p-8 w-full"
-        animate={{
-          marginLeft:
-            pathname == "/institute/login" ? 0 : isCollapsed ? "2rem" : "16rem",
-        }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-      >
       <div className="flex flex-1">
         <MainContent
           applicationTypes={typedApplicationTypes}
@@ -481,21 +468,7 @@ export default function Dashboard() {
           instituteId={instituteData?.id}
           universityName={instituteData.universityName}
         />
-      </div>
-      </motion.main>
-      <motion.div
-        whileHover={{ scale: 1.1 }}
-        className="fixed bottom-12 right-[40px]"
-      >
-        <Button
-          size="icon"
-          className="h-12 w-12 rounded-full"
-          onClick={() => setIsChatOpen(!isChatOpen)}
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-      </motion.div>
-      <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+        </div>
     </div>
   );
 }
