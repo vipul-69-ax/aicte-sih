@@ -7,29 +7,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useChatPdf } from '@/hooks/useChatPdf'
 
-interface Message {
-  id: number
-  role: 'user' | 'ai'
-  content: string
+type ErrorChatbotProps ={
+    pdfUrl:string
 }
 
-export default function ErrorChatbot() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, role: 'ai', content: 'Hello! I can help you understand the errors in your document. What would you like to know?' }
-  ])
+export default function ErrorChatbot({pdfUrl}:ErrorChatbotProps) {
   const [input, setInput] = useState('')
+  const { messages, sendMessage, isConnected } = useChatPdf('ws://localhost:8000/chat-pdf', pdfUrl)
 
   const handleSend = () => {
     if (input.trim()) {
-      const newUserMessage = { id: Date.now(), role: 'user' as const, content: input }
-      setMessages(prev => [...prev, newUserMessage])
+      sendMessage(input)
       setInput('')
-      // Simulate AI response
-      setTimeout(() => {
-        const newAiMessage = { id: Date.now(), role: 'ai' as const, content: 'I understand your concern. Let me check the errors for you.' }
-        setMessages(prev => [...prev, newAiMessage])
-      }, 1000)
     }
   }
 
@@ -37,7 +28,14 @@ export default function ErrorChatbot() {
     <div className="container w-full mx-auto p-4 flex justify-center items-center min-h-screen">
       <Card className="w-full shadow-lg">
         <CardHeader className="border-b">
-          <CardTitle className="text-lg font-medium">Error Chat Assistant</CardTitle>
+          <CardTitle className="text-lg font-medium">
+            Error Chat Assistant
+            {isConnected ? (
+              <span className="ml-2 text-sm text-green-500">●</span>
+            ) : (
+              <span className="ml-2 text-sm text-red-500">●</span>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="h-[50vh] p-4">
@@ -75,7 +73,7 @@ export default function ErrorChatbot() {
               className="flex-grow"
             />
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button type="submit" size="icon" disabled={!input.trim()}>
+              <Button type="submit" size="icon" disabled={!input.trim() || !isConnected}>
                 <Send className="h-4 w-4" />
                 <span className="sr-only">Send</span>
               </Button>
@@ -86,3 +84,4 @@ export default function ErrorChatbot() {
     </div>
   )
 }
+

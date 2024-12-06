@@ -157,7 +157,9 @@ export default function ErrorFixPage() {
       </div>
       <div className="">
         <ErrorDisplay errors={errors} />
-        <ErrorChatbot />
+        <ErrorChatbot 
+            pdfUrl={"https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"}
+        />
       </div>
       
     </div>
