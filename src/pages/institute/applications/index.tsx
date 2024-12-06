@@ -44,15 +44,15 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import {
   UniversityApplication,
-  ApplicationDocument,
 } from "@/schemas/applicationSchema";
 import applicationTypes from "@/data/applicationTypes.json";
 
-const getApplicationStatus = (documents: ApplicationDocument[]): string => {
-  const approvedCount = documents.filter(
-    (doc) => doc.status === "APPROVED"
+const getApplicationStatus = (documents: UniversityApplication): string => {
+  const approvedCount = documents.UniversityDocuments.filter(
+    (doc) => doc.status != "NOT_SUBMITTED"
   ).length;
-  if (approvedCount === documents.length) return "Approved";
+  if (approvedCount === documents.application.documents.length)
+    return "Approved";
   if (approvedCount > 0) return "In Progress";
   return "Not Started";
 };
@@ -108,7 +108,7 @@ const ApplicationsPage: React.FC = () => {
 
     if (statuses.length > 0) {
       result = result.filter((app) =>
-        statuses.includes(getApplicationStatus(app.UniversityDocuments))
+        statuses.includes(getApplicationStatus(app))
       );
     }
 
@@ -121,10 +121,10 @@ const ApplicationsPage: React.FC = () => {
 
   const totalApplications = applications.length;
   const approvedApplications = applications.filter(
-    (app) => getApplicationStatus(app.UniversityDocuments) === "Approved"
+    (app) => getApplicationStatus(app) === "Approved"
   ).length;
   const inProgressApplications = applications.filter(
-    (app) => getApplicationStatus(app.UniversityDocuments) === "In Progress"
+    (app) => getApplicationStatus(app) === "In Progress"
   ).length;
 
   const chartData = [
@@ -265,7 +265,7 @@ const ApplicationsPage: React.FC = () => {
                         </p>
                       </div>
                       <Badge>
-                        {getApplicationStatus(app.UniversityDocuments)}
+                        {getApplicationStatus(app)}
                       </Badge>
                     </div>
                   ))
@@ -378,9 +378,7 @@ const ApplicationsPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <Badge>
-                        {getApplicationStatus(app.UniversityDocuments)}
-                      </Badge>
+                      <Badge>{getApplicationStatus(app)}</Badge>
                       <Button
                         variant="ghost"
                         size="icon"

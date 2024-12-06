@@ -23,13 +23,13 @@ export type ServerApplicationTypes = {
   application_id: string;
   application_name: string;
   application_description: string;
+  documents: { documentR:Document}[];
 }
 export interface SubmitUniversityApplication {
   uni_application_id: string;
   application_id: string;
   application_name: string;
   application_description: string;
-  UniversityDocuments: SubmitApplicationDocument[];
 };
 export interface UniversityApplication extends SubmitUniversityApplication {
   UniversityDocuments: ApplicationDocument[];

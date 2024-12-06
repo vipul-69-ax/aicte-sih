@@ -36,8 +36,10 @@ export function useFileUpload() {
 }
 
 type VerifyBody = {
-    fileUrl:string,
-    formatId:string
+  uni_doc_uri: string,
+  doc_id: string,
+  formatId: string,
+    uni_application_id:string,
 }
 
 export function useFileVerification(){

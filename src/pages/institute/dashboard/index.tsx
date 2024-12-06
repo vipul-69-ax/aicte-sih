@@ -243,19 +243,19 @@ const MainContent: React.FC<MainContentProps> = ({
       application_description: formData.description,
       application_name: formData.name,
       application_id: selectedTypeId,
-      UniversityDocuments: applicationTypes
-        .find((x) => x.id === selectedTypeId)
-        ?.documents.map((doc: any) => {
-          return {
-            uni_doc_id: `Application-${uuid4()}`,
-            uni_doc_name: doc.name,
-            doc_id: doc.id,
-            errors: [],
-            uni_doc_uri: doc.pdfPath,
-            timestamp: new Date(),
-            status: "NOT_SUBMITTED",
-          };
-        }) as SubmitApplicationDocument[],
+      // UniversityDocuments: applicationTypes
+      //   .find((x) => x.id === selectedTypeId)
+      //   ?.documents.map((doc: any) => {
+      //     return {
+      //       uni_doc_id: `Application-${uuid4()}`,
+      //       uni_doc_name: doc.name,
+      //       doc_id: doc.id,
+      //       errors: [],
+      //       uni_doc_uri: doc.pdfPath,
+      //       timestamp: new Date(),
+      //       status: "NOT_SUBMITTED",
+      //     };
+      //   }) as SubmitApplicationDocument[],
     };
     await upload({
       application: data,
@@ -449,7 +449,6 @@ export default function Dashboard() {
     setInstituteData(data.data);
     setInstituteId(data.data.id);
   };
-  
 
   React.useEffect(() => {
     fetchInstituteData();
@@ -468,7 +467,7 @@ export default function Dashboard() {
           instituteId={instituteData?.id}
           universityName={instituteData.universityName}
         />
-        </div>
+      </div>
     </div>
   );
 }

@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Upload, Eye } from "lucide-react";
+import { Upload, Eye, X } from "lucide-react";
 import { PDFViewer } from "@/components/PdfViewer";
 import {
   UniversityApplication,
@@ -57,7 +57,7 @@ export default function ApplicationDashboard() {
       <div className="container mx-auto p-6 space-y-8">
         <DashboardHeader
           applicationName={documentData.application.application_name}
-          applicationType={documentData.uni_application_id}
+          applicationType={documentData.application_name}
         />
         <div className="grid gap-8 md:grid-cols-2">
           <DashboardSummary documentData={documentData} />
@@ -105,7 +105,8 @@ function DashboardSummary({
 }: {
   documentData: UniversityApplication;
 }) {
-  const totalDocuments = documentData.UniversityDocuments.length;
+  const totalDocuments = documentData.application.documents.length;
+  const submittedDocuments = documentData.UniversityDocuments.length;
   const approvedDocuments = documentData.UniversityDocuments.filter(
     (doc: ApplicationDocument) => doc.status === "APPROVED"
   ).length;
@@ -124,6 +125,14 @@ function DashboardSummary({
           </span>
           <span className="text-2xl font-bold text-[#3498db]">
             {totalDocuments}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium text-[#7f8c8d]">
+            Submitted Document
+          </span>
+          <span className="text-2xl font-bold text-[#3498db]">
+            {submittedDocuments}
           </span>
         </div>
         <div className="flex justify-between items-center">
@@ -174,25 +183,31 @@ function DocumentStatusOverview({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={200}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Legend />
-          </PieChart>
+          {data.length == 0 ? (
+            <div className="flex h-full justify-center">
+              <div className="self-center">Not Submitted Any Documents</div>
+            </div>
+          ) : (
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Legend />
+            </PieChart>
+          )}
         </ResponsiveContainer>
       </CardContent>
     </Card>
@@ -203,19 +218,20 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [filter, setFilter] = useState("");
-  const {id:application_id} = useParams()
-
-  const sortedAndFilteredDocuments = documents.UniversityDocuments.filter(
-    (doc) => doc.uni_doc_name.toLowerCase().includes(filter.toLowerCase())
-  ).sort((a, b) => {
-    if (!sortColumn) return 0;
-    const aValue = a[sortColumn];
-    const bValue = b[sortColumn];
-    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
+  const { id: application_id } = useParams();
+  console.log("documentlist", documents);
+  const sortedAndFilteredDocuments = documents.application.documents
+    .filter((doc) =>
+      doc.documentR.doc_name.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (!sortColumn) return 0;
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
   const handleSort = (column: string) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -225,7 +241,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
     }
   };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-4 bg-white p-6 rounded-lg shadow-sm">
@@ -256,64 +272,76 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedAndFilteredDocuments.map((doc) => (
-            <TableRow key={doc.doc_id}>
-              <TableCell className="font-medium text-[#34495e]">
-                {doc.uni_doc_name}
-              </TableCell>
-              <TableCell>
-                <Badge>{doc.status}</Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
+          {sortedAndFilteredDocuments.map((doc) => {
+            const allStatus = documents.UniversityDocuments.filter(
+              (uniDoc) => uniDoc.doc_id == doc.documentR.doc_id
+            );
+            const status =
+              allStatus.length > 0 ? allStatus[0].status : "NOT_SUBMITTED";
+            return (
+              <TableRow key={doc.documentR.doc_id}>
+                <TableCell className="font-medium text-[#34495e]">
+                  {doc.documentR.doc_name}
+                </TableCell>
+                <TableCell>
+                  <Badge>{status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex space-x-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={()=>{
-                          navigate("/institute/upload-document",{state:{
-                            application_id,
-                            doc
-                          }})
+                        onClick={() => {
+                          navigate("/institute/upload-document", {
+                            state: {
+                              application_id,
+                              doc,
+                            },
+                          });
                         }}
                         className="text-[#3498db] border-[#3498db] hover:bg-[#3498db] hover:text-white"
                       >
                         <Upload className="w-4 h-4 mr-2" />
-                        Upload
+                        {/* TODO implement view uploaded File */}
+                        {status == "NOT_SUBMITTED" ? "Upload" : "View"}
                       </Button>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={()=>{
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={()=>{
                           navigate("/institute/error-fix")
                         }}
                         className="text-[#2ecc71] border-[#2ecc71] hover:bg-[#2ecc71] hover:text-white"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Format
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Document Format</DialogTitle>
-                        <DialogDescription>
-                          Format details for {doc.uni_doc_name}
-                        </DialogDescription>
-                      </DialogHeader>
-                      <PDFViewer
-                        pdfPath={
-                          doc.document
-                            ? doc.document.format_uri
-                            : "https://www.aicte-india.org/sites/default/files/approval/APH%20Final.pdf"
-                        }
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Format
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Document Format</DialogTitle>
+                            <DialogDescription>
+                              Format details for {doc.documentR.doc_name}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <PDFViewer
+                            pdfPath={
+                              doc.documentR.format_uri
+                                ? doc.documentR.format_uri
+                                : "https://www.aicte-india.org/sites/default/files/approval/APH%20Final.pdf"
+                            }
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
