@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.routers import chat_router, detect_router
 from fastapi.middleware.cors import CORSMiddleware
-
+from groq import Groq
 app = FastAPI()
 
 app.add_middleware(
@@ -49,3 +49,77 @@ async def websocket_endpoint(websocket: WebSocket):
     
     except WebSocketDisconnect:
         print("WebSocket disconnected")
+
+
+groq_api_key = "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"
+
+import json
+import logging
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from groq import Groq
+import requests
+from io import BytesIO
+from PyPDF2 import PdfReader
+
+app = FastAPI()
+
+def extract_text_from_pdf_url(pdf_url):
+    try:
+        response = requests.get(pdf_url)
+        response.raise_for_status()
+        pdf_file = BytesIO(response.content)
+        pdf_reader = PdfReader(pdf_file)
+        text = ""
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+        return text
+    except Exception as e:
+        logging.error(f"Error extracting text from PDF: {e}")
+        return None
+
+@app.websocket("/chat-pdf")
+async def chat_pdf(websocket: WebSocket):
+    await websocket.accept()
+    client = Groq(api_key=groq_api_key)
+
+    try:
+        while True:
+            # Receive data from the client
+            data = await websocket.receive_text()
+            body = json.loads(data)
+            user_message = body.get("message", "")
+            pdf_url = body.get("pdf_url", "")
+
+            # Extract text from the PDF
+            pdf_text = extract_text_from_pdf_url(pdf_url)
+            if pdf_text is None:
+                await websocket.send_text(json.dumps({"error": "Failed to extract text from PDF"}))
+                continue
+
+            # Construct the prompt
+            prompt = f"""
+            You are an AI assistant specialized in analyzing PDF documents.
+            PDF Content:
+            {pdf_text[:1000]}  # Limiting to first 1000 characters for brevity
+            User Question: {user_message}
+            """
+
+            # Stream the response to the client
+            try:
+                completion = client.chat.completions.create(
+                    model="llama3-8b-8192",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.7,
+                    max_tokens=1024,
+                    top_p=1,
+                )
+                print(completion.choices[0].message.content)
+                
+                await websocket.send_text(json.dumps({"content": completion.choices[0].message.content}))
+            except Exception as e:
+                logging.error(f"Error in chat: {e}")
+                await websocket.send_text(json.dumps({"error": str(e)}))
+    except WebSocketDisconnect:
+        logging.info("WebSocket connection closed")
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
