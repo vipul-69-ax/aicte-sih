@@ -1,3 +1,22 @@
+const { EvaluatorSchema } = require("../api/controllers/evaluator/auth/auth.controller");
+const prisma = require("../api/utils/db");
+const argon2 = require("argon2");
+const evaluatorRegisterForSeeder = async (data) => {
+    const validResult = EvaluatorSchema.safeParse(data);
+    if (!validResult.success) {
+        return console.log("Not a valid Structure", validResult.error);
+    }
+    const hashedPassword = await argon2.hash(data.password);
+    data.password = hashedPassword;
+    try {
+        const dbEvaluatorRes = await prisma.evaluator.create({ data: data });
+    }
+    catch (err) {
+        console.log("evaluation Registration failed", err);
+        process.exit(1);
+    }
+}
+
 const applicationTypes = [
     {
         application_id: "new_institute",
@@ -212,4 +231,4 @@ const applicationTypes = [
         ],
     },
 ];
-module.exports = { applicationTypes }
+module.exports = { evaluatorRegisterForSeeder, applicationTypes }

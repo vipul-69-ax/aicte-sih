@@ -2,6 +2,9 @@
     "prisma.schemaPath": "prisma/schema.prisma",
     "cSpell.words": [
         "aicte",
+        "aivencloud",
+        "avnadmin",
+        "AVNS",
         "contatct",
         "datasource",
         "gcsc",

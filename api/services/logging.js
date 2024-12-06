@@ -1,7 +1,7 @@
 const prisma = require("../utils/db");
 const fs = require('fs')
-const outputLog = fs.createWriteStream('./outputLog.log');
-const errorsLog = fs.createWriteStream('./errorsLog.log');
+const outputLog = fs.createWriteStream('./outputLog.log', { flags: "a" });
+const errorsLog = fs.createWriteStream('./errorsLog.log', { flags: "a" });
 const consoler = new console.Console(outputLog, errorsLog);
 
 class Log {
@@ -56,6 +56,9 @@ class Logger {
             else retry = 3;
         }
 
+    }
+    error(err) {
+        consoler.error(err);
     }
     async log(log) {
         this.allLogs.push(log);

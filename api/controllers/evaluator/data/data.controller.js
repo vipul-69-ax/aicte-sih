@@ -1,4 +1,5 @@
 const { LogAction, Doer, LogObject } = require("../../../services/enums");
+const { assignDocumentToEvaluator } = require("../../../services/evaluatorMatching");
 const { actionLogger, Log } = require("../../../services/logging");
 const prisma = require("../../../utils/db");
 
@@ -7,11 +8,15 @@ const allowedStatusActions = ['IN_REVIEW', 'APPROVED', 'REJECTED'];
 const getAssignedDocuments = async (req, res) => {
     console.log(req);
     const authData = req.authData;
-    if (authData.role != "evaluator") {
+    if (!authData.role.includes("evaluator")) {
         res.status(401).json({ errors: "Not authorized as Evaluator." })
     }
     try {
-        const assignedDocuments = await prisma.universityDocuments.findMany({ where: { evaluator_id: authData.evaluator_id } });
+        let assignedDocuments = await prisma.universityDocuments.findMany({ where: { evaluator_id: authData.evaluator_id } });
+        if (assignedDocuments.length == 0) {
+            await assignDocumentToEvaluator([authData.evaluator_id]);
+        }
+        assignedDocuments = await prisma.universityDocuments.findMany({ where: { evaluator_id: authData.evaluator_id } });
         return res.status(200).json({ data: assignedDocuments });
     }
     catch (err) {

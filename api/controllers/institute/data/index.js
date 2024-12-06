@@ -2,6 +2,7 @@ const { default: axios } = require("axios");
 const { LogAction, Doer, LogObject } = require("../../../services/enums");
 const { actionLogger, Log } = require("../../../services/logging");
 const prisma = require("../../../utils/db");
+const { object } = require("zod");
 
 const availableApplication = async (req, res) => {
     try {
@@ -65,9 +66,7 @@ const start_new_application = async (req, res) => {
 
         const applicationRes = await prisma.universityApplication.create({
             data: {
-                uni_application_id: application.uni_application_id, application_id: application.application_id, universityId: institute_id, UniversityDocuments: {
-                    create: application.UniversityDocuments
-                }
+                uni_application_id: application.uni_application_id, application_name: application.application_name, application_desc: application.application_description, application_id: application.application_id, universityId: institute_id
             }
         });
         actionLogger.log(new Log(Date.now(), applicationRes.uni_application_id, undefined, undefined, LogAction.APP_CREATED, Doer.UNIVERSITY, LogObject.APPLICATION));
@@ -101,7 +100,7 @@ const get_applications = async (req, res) => {
         //   `;
 
         //     const result = await db.query(query, [institute_id]);
-        const applications = await prisma.universityApplication.findMany({ orderBy: { createdOn: "desc" }, where: { universityId: institute_id }, include: { UniversityDocuments: true, application: true } });
+        const applications = await prisma.universityApplication.findMany({ orderBy: { createdOn: "desc" }, where: { universityId: institute_id }, include: { UniversityDocuments: true, application: { include: { documents: true } } } });
         applications.documents = applications.UniversityDocuments;
         delete applications.UniversityDocuments;
         if (!applications) {
@@ -140,7 +139,7 @@ const get_application_document_by_id = async (req, res) => {
         //     const values = [institute_id, application_id];
 
         //     const result = await db.query(query, values);
-        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id }, include: { application: true, UniversityDocuments: { include: { document: true } }, } });
+        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id }, include: { application: { include: { documents: { include: { documentR: true } } } }, UniversityDocuments: { include: { document: true } } } });
 
         if (!documents) {
             return res.status(404).json({ error: "No application found with the given Application ID for the given instituteID." });
@@ -156,14 +155,24 @@ const get_application_document_by_id = async (req, res) => {
     }
 }
 
-
+const docUpload = async (uni_application_id, doc_id, uni_doc_uri, errors) => {
+    try {
+        const document = await prisma.UniversityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: errors, status: "SUBMITTED" } })
+        await actionLogger.log(new Log(Date.now(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
+    }
+    catch (err) {
+        console.error(err);
+        actionLogger.error(`${uni_doc_uri} failed creating doc for application_id ${uni_application_id}`);
+    }
+}
 const document_analysis = async (req, res) => {
     const FASTAPIURL = "http://localhost:8000";
-
+    const { uni_application_id, doc_id, uni_doc_uri } = req.body;
+    let response;
     try {
-        const response = await axios.post(`${FASTAPIURL}/chat/comparison`, {
+        response = await axios.post(`${FASTAPIURL}/chat/comparison`, {
             template_url: req.body.formatId,
-            filled_url: req.body.fileUrl
+            filled_url: req.body.uni_doc_uri
         });
 
         // Sending the response back to the client with the data
@@ -179,6 +188,10 @@ const document_analysis = async (req, res) => {
             success: false,
             message: error.response?.data?.detail || "An error occurred while processing the request.",
         });
+    }
+    finally {
+        console.log("uploading")
+        await docUpload(uni_application_id, doc_id, uni_doc_uri, response.data);
     }
 };
 

@@ -75,4 +75,4 @@ const evaluatorResetPassword = async (req, res) => {
   }
 }
 
-module.exports = { evaluatorLogin, evaluatorRegister }
+module.exports = { evaluatorLogin, evaluatorRegister, EvaluatorSchema }

@@ -6,6 +6,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 enum Doer {
   EVALUATOR
   UNIVERSITY
@@ -79,6 +83,8 @@ model University {
   universityType        String
   state                 String
   district              String
+  //TODO can be used for scheduling
+  geolocation           String?
   pincode               Int
   status                InstituteStatus         @default(UNVERIFIED)
   contatctDetails       ContactDetails?
@@ -102,6 +108,8 @@ model Evaluator {
 model UniversityApplication {
   uni_application_id  String                @id @default(uuid())
   application_id      String
+  application_name    String
+  application_desc    String
   messages            Json?
   createdOn           DateTime              @default(now())
   universityId        String
@@ -117,14 +125,13 @@ model UniversityDocuments {
   uni_doc_id         String                @id @default(uuid())
   uni_application_id String
   doc_id             String
-  uni_doc_name       String
   errors             Json?
   extractedTexts     String?
   uni_doc_uri        String?
   timestamp          DateTime              @default(now())
   messages           Json?
   status             DocumentStatus        @default(NOT_SUBMITTED)
-  application        UniversityApplication @relation(fields: [uni_application_id], references: [uni_application_id])
+  application        UniversityApplication @relation(fields: [uni_application_id], references: [uni_application_id], onDelete: Cascade)
   document           Document              @relation(fields: [doc_id], references: [doc_id])
   Evaluator          Evaluator?            @relation(fields: [evaluator_id], references: [evaluator_id])
   evaluator_id       String?
