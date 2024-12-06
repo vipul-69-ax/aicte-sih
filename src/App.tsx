@@ -15,6 +15,7 @@ import Settings from "./pages/institute/settings";
 import InstituteOtpForm from "./pages/institute/auth/otp";
 import { api } from "./lib/utils";
 import UploadLegalDocument from "./pages/institute/applications/UploadDocument";
+import ErrorFix from "./pages/institute/applications/ErrorFixPage";
 
 export const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ export default function App() {
             <Route path="upload-document" element={<UploadLegalDocument />} />
             <Route path="applications/:id" element={<ApplicationData />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="error-fix" element={<ErrorFix />} />
           </Route>
         )}
 
