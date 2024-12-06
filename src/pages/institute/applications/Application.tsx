@@ -311,7 +311,10 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-[#2ecc71] border-[#2ecc71] hover:bg-[#2ecc71] hover:text-white"
+                            onClick={()=>{
+                          navigate("/institute/error-fix")
+                        }}
+                        className="text-[#2ecc71] border-[#2ecc71] hover:bg-[#2ecc71] hover:text-white"
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             View Format

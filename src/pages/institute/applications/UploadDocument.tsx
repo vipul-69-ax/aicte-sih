@@ -11,10 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, AlertTriangle, FileText, CheckCircle } from "lucide-react";
+import {
+  Upload,
+  AlertTriangle,
+  FileText,
+  CheckCircle,
+  Loader,
+} from "lucide-react";
 import { useFileUpload, useFileVerification } from "@/hooks/useFileUpload";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AicteLogo from "@/assets/aicte-logo.webp";
+import VerificationPopup from "@/components/VerificationPopup";
 
 const aicteTheme = {
   primary: "#1e40af", // AICTE blue
@@ -27,7 +34,7 @@ const aicteTheme = {
 export default function UploadLegalDocument() {
   const [file, setFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const { application_id, doc } = useLocation().state;
+  const { doc, application_id } = useLocation().state;
   const {
     mutate: uploadFile,
     isPending,
@@ -95,7 +102,7 @@ export default function UploadLegalDocument() {
             style={{ backgroundColor: aicteTheme.primary, color: "white" }}
           >
             <CardTitle className="text-2xl font-bold">
-              Upload {doc.documentR.doc_name}
+              Upload {doc.uni_doc_name}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -208,17 +215,15 @@ export default function UploadLegalDocument() {
 
 function ForgeryGuidelines() {
   return (
-    <Card className="mt-6 shadow-lg">
-      <CardHeader
-        style={{ backgroundColor: aicteTheme.secondary, color: "white" }}
-      >
+    <Card className="w-full md:w-1/3 shadow-lg">
+      <CardHeader className="bg-black text-white">
         <CardTitle className="text-xl font-bold flex items-center">
           <AlertTriangle className="mr-2" />
           Guidelines Against Forgery
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <ul className="list-disc pl-5 space-y-2">
+        <ul className="list-disc pl-5 space-y-2 text-gray-700">
           <li>Ensure all documents are original and unaltered.</li>
           <li>
             Do not attempt to modify or falsify any information within the
