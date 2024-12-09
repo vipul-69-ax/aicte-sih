@@ -102,7 +102,7 @@ export default function UploadLegalDocument() {
             style={{ backgroundColor: aicteTheme.primary, color: "white" }}
           >
             <CardTitle className="text-2xl font-bold">
-              Upload {doc.uni_doc_name}
+              Upload {doc.documentR.doc_name}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -204,6 +204,9 @@ export default function UploadLegalDocument() {
                   Cancel
                 </Button>
               )}
+              {file && isVerifying && (
+                <div>Your File is being checked by our Smart AI</div>
+              )}
             </div>
           </CardFooter>
         </Card>
@@ -215,7 +218,7 @@ export default function UploadLegalDocument() {
 
 function ForgeryGuidelines() {
   return (
-    <Card className="w-full md:w-1/3 shadow-lg">
+    <Card className="md:w-full sm:w-1/3 shadow-lg">
       <CardHeader className="bg-black text-white">
         <CardTitle className="text-xl font-bold flex items-center">
           <AlertTriangle className="mr-2" />

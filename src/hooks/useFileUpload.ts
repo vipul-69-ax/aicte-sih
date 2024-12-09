@@ -3,6 +3,7 @@ import {createClient} from '@supabase/supabase-js'
 import axios from 'axios'
 import { SERVER_URL } from '@/constants/API'
 import { api } from '@/lib/utils'
+import { Navigate, useNavigate } from 'react-router-dom'
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -42,14 +43,16 @@ type VerifyBody = {
     uni_application_id:string,
 }
 
-export function useFileVerification(){
+export function useFileVerification() {
+  const navigate = useNavigate();
     return useMutation({
         mutationFn:async(verifyBody:VerifyBody)=>{
             const req = await api.post(`${SERVER_URL}/institute/data/document_analysis`,verifyBody)
             console.log(req.data)
             return req.data
         },
-        onSuccess:(data)=>{
+      onSuccess: (data) => {
+        navigate("/institute/error-fix");
         },
         onError:(err)=>{
             alert(JSON.stringify(err.message))

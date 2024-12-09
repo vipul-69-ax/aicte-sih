@@ -293,12 +293,17 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          navigate("/institute/upload-document", {
-                            state: {
-                              application_id,
-                              doc,
-                            },
-                          });
+                          navigate(
+                            status == "NOT_SUBMITTED"
+                              ? "/institute/upload-document"
+                              : "/institute/error-fix",
+                            {
+                              state: {
+                                application_id,
+                                doc,
+                              },
+                            }
+                          );
                         }}
                         className="text-[#3498db] border-[#3498db] hover:bg-[#3498db] hover:text-white"
                       >
@@ -311,10 +316,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={()=>{
-                          navigate("/institute/error-fix")
-                        }}
-                        className="text-[#2ecc71] border-[#2ecc71] hover:bg-[#2ecc71] hover:text-white"
+                            className="text-[#2ecc71] border-[#2ecc71] hover:bg-[#2ecc71] hover:text-white"
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             View Format
