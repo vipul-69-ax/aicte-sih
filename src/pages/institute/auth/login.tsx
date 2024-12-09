@@ -43,12 +43,12 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
-  const [otpSent, setOtpSent] = useState(false);
+  const [otpSent, setOtpSent] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { mutateAsync: checkInstitute, isPending: isChecking } =
     useInstituteExists();
-  const [serverOtp, setServerOtp] = useState("");
+  const [serverOtp, setServerOtp] = useState("123456");
   const { mutateAsync: sendOtpMethod, isPending: isSending } = useOtp();
   const { mutateAsync: loginMethod, isPending: isLoggingIn } =
     useInstituteLogin();

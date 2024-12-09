@@ -1,8 +1,12 @@
 import ErrorChatbot from "@/components/PdfErrorFix/ErrorChatbot";
 import PdfEditor from "@/components/PdfErrorFix/PdfEditor/PdfEditor";
-import { ErrorViewer } from "@/components/PdfErrorFix/PdfHighlightComponent";
+import {
+  ErrorHighlight,
+  ErrorViewer,
+} from "@/components/PdfErrorFix/PdfHighlightComponent";
 import ErrorDisplay from "@/components/PdfErrorFix/PlaceholderErrorComponent";
 import PreviousUploads from "@/components/PdfErrorFix/PreviousUploads";
+import { ApplicationDocument } from "@/schemas/applicationSchema";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -47,7 +51,7 @@ const errors = {
         "The text appears to be a mixture of document information and Trust/Society/Company name",
       ],
       suggestions: [
-        "Consider separating the company name and document information into different fields",
+        "Consider separating the company name and document in formation into different fields",
       ],
       bbox: [12, 3],
     },
@@ -140,7 +144,12 @@ const errorHighlights = [
 
 export default function ErrorFixPage() {
   const [editorError, setEditorError] = useState<string | null>(null);
-  const { doc } = useLocation().state;
+  const {
+    currentUniDoc,
+  }: {
+    currentUniDoc: ApplicationDocument[];
+  } = useLocation().state;
+  console.log("currentUniDoc", currentUniDoc);
   return (
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold mb-6">
@@ -149,14 +158,18 @@ export default function ErrorFixPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <ErrorViewer
-            url="https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"
-            errors={errorHighlights}
+            url={
+              currentUniDoc[0].uni_doc_uri ??
+              "https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"
+            }
+            errors={currentUniDoc[0].errors as ErrorHighlight[]}
           />
         </div>
         <div className="">
-          <ErrorDisplay errors={errors} />
+          <ErrorDisplay errors={currentUniDoc[0].extractedTexts ?? errors} />
           <ErrorChatbot
             pdfUrl={
+              currentUniDoc[0].uni_doc_uri ??
               "https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"
             }
           />
@@ -164,6 +177,7 @@ export default function ErrorFixPage() {
       </div>
       <PdfEditor
         url={
+          currentUniDoc[0].uni_doc_uri ??
           "https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"
         }
         onError={setEditorError}

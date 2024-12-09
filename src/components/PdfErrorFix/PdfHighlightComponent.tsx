@@ -1,12 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, FileText } from 'lucide-react';
-import { pdfjsLib } from '@/lib/pdfjs-setup';
-import { PdfHighlight } from './PdfPopover';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loader2, FileText } from "lucide-react";
+import { pdfjsLib } from "@/lib/pdfjs-setup";
+import { PdfHighlight } from "./PdfPopover";
 import { useToast } from "@/hooks/use-toast";
-import PreviousUploadsDialog from './PreviousUploads';
+import PreviousUploadsDialog from "./PreviousUploads";
 
-interface ErrorHighlight {
+export interface ErrorHighlight {
   content: {
     text: string;
   };
@@ -27,7 +33,7 @@ interface ErrorHighlight {
   id: string;
 }
 
-interface PdfViewerProps {
+export interface PdfViewerProps {
   url: string;
   errors: ErrorHighlight[];
 }
@@ -53,7 +59,7 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
         setNumPages(pdf.numPages);
         setIsLoading(false);
       } catch (error) {
-        console.error('Error loading PDF:', error);
+        console.error("Error loading PDF:", error);
         setIsLoading(false);
       }
     };
@@ -67,15 +73,15 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
 
       try {
         const page = await pdfDoc.getPage(currentPage);
-        
+
         const containerWidth = containerRef.current.clientWidth - 32;
         const viewport = page.getViewport({ scale: 1.0 });
         const scaleFactor = containerWidth / viewport.width;
         const finalScale = scaleFactor * (window.devicePixelRatio || 1);
-        
+
         const scaledViewport = page.getViewport({ scale: finalScale });
         const canvas = canvasRef.current;
-        const context = canvas.getContext('2d', { alpha: false });
+        const context = canvas.getContext("2d", { alpha: false });
 
         if (!context) return;
 
@@ -83,12 +89,14 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
         canvas.height = scaledViewport.height;
 
         canvas.style.width = `${containerWidth}px`;
-        canvas.style.height = `${(containerWidth * scaledViewport.height) / scaledViewport.width}px`;
+        canvas.style.height = `${
+          (containerWidth * scaledViewport.height) / scaledViewport.width
+        }px`;
 
         context.imageSmoothingEnabled = true;
-        context.imageSmoothingQuality = 'high';
+        context.imageSmoothingQuality = "high";
 
-        context.fillStyle = 'white';
+        context.fillStyle = "white";
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const renderContext = {
@@ -101,7 +109,7 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
         await page.render(renderContext).promise;
         setScale(scaleFactor);
       } catch (error) {
-        console.error('Error rendering PDF page:', error);
+        console.error("Error rendering PDF page:", error);
       }
     };
 
@@ -111,13 +119,13 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
       renderPage();
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [pdfDoc, currentPage]);
 
   const handleTextChange = (highlightId: string, newText: string) => {
-    setHighlights(prevHighlights =>
-      prevHighlights.map(highlight =>
+    setHighlights((prevHighlights) =>
+      prevHighlights.map((highlight) =>
         highlight.id === highlightId
           ? { ...highlight, content: { ...highlight.content, text: newText } }
           : highlight
@@ -141,7 +149,7 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
   const currentHighlights = highlights.filter(
     (highlight) => highlight.position.pageNumber === currentPage
   );
-
+  console.log("currentHighlights", currentHighlights);
   return (
     <div className="flex min-h-screen p-4">
       <Card className="w-full max-w-4xl h-full">
@@ -154,28 +162,28 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
             <PreviousUploadsDialog
               uploads={[
                 {
-                  id: '1',
-                  fileName: 'document1.pdf',
-                  uploadDate: '2023-06-01',
+                  id: "1",
+                  fileName: "document1.pdf",
+                  uploadDate: "2023-06-01",
                   layoutErrors: 3,
                   placeholderErrors: 2,
-                  pdfUrl: 'https://example.com/document1.pdf'
+                  pdfUrl: "https://example.com/document1.pdf",
                 },
                 {
-                  id: '2',
-                  fileName: 'document2.pdf',
-                  uploadDate: '2023-06-05',
+                  id: "2",
+                  fileName: "document2.pdf",
+                  uploadDate: "2023-06-05",
                   layoutErrors: 0,
                   placeholderErrors: 1,
-                  pdfUrl: 'https://example.com/document2.pdf'
+                  pdfUrl: "https://example.com/document2.pdf",
                 },
                 {
-                  id: '3',
-                  fileName: 'document3.pdf',
-                  uploadDate: '2023-06-10',
+                  id: "3",
+                  fileName: "document3.pdf",
+                  uploadDate: "2023-06-10",
                   layoutErrors: 5,
                   placeholderErrors: 0,
-                  pdfUrl: 'https://example.com/document3.pdf'
+                  pdfUrl: "https://example.com/document3.pdf",
                 },
               ]}
             />
@@ -185,10 +193,7 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
           <div className="flex flex-col items-center">
             <div className="w-full bg-white rounded-lg shadow-lg">
               <div ref={containerRef} className="relative p-4">
-                <canvas 
-                  ref={canvasRef} 
-                  className="w-full h-auto"
-                />
+                <canvas ref={canvasRef} className="w-full h-auto" />
                 <div className="absolute top-0 left-0 w-full h-full">
                   {currentHighlights.map((highlight) => (
                     <PdfHighlight
@@ -199,7 +204,9 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
                       height={highlight.position.boundingRect.height * scale}
                       text={highlight.content.text}
                       comment={highlight.comment}
-                      onTextChange={(newText) => handleTextChange(highlight.id, newText)}
+                      onTextChange={(newText) =>
+                        handleTextChange(highlight.id, newText)
+                      }
                     />
                   ))}
                 </div>

@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Upload, Eye, X } from "lucide-react";
+import { Upload, Eye, X, UndoIcon } from "lucide-react";
 import { PDFViewer } from "@/components/PdfViewer";
 import {
   UniversityApplication,
@@ -107,6 +107,9 @@ function DashboardSummary({
 }) {
   const totalDocuments = documentData.application.documents.length;
   const submittedDocuments = documentData.UniversityDocuments.length;
+  const rejectedDocuments = documentData.UniversityDocuments.filter(
+    (doc) => doc.status == "REJECTED"
+  ).length;
   const approvedDocuments = documentData.UniversityDocuments.filter(
     (doc: ApplicationDocument) => doc.status === "APPROVED"
   ).length;
@@ -132,7 +135,7 @@ function DashboardSummary({
             Submitted Document
           </span>
           <span className="text-2xl font-bold text-[#3498db]">
-            {submittedDocuments}
+            {`${submittedDocuments} (${rejectedDocuments}R)`}
           </span>
         </div>
         <div className="flex justify-between items-center">
@@ -232,6 +235,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
       if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
+  console.log("sorted", sortedAndFilteredDocuments);
   const handleSort = (column: string) => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -273,11 +277,18 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
         </TableHeader>
         <TableBody>
           {sortedAndFilteredDocuments.map((doc) => {
-            const allStatus = documents.UniversityDocuments.filter(
-              (uniDoc) => uniDoc.doc_id == doc.documentR.doc_id
+            const currentUniDoc = documents.UniversityDocuments.filter(
+              (uniDoc) => uniDoc.doc_id == doc.doc_id
+            ).sort(
+              (a, b) =>
+                new Date(b.timestamp).getTime() -
+                new Date(a.timestamp).getTime()
             );
+            console.log("currentUniDoc", currentUniDoc);
             const status =
-              allStatus.length > 0 ? allStatus[0].status : "NOT_SUBMITTED";
+              currentUniDoc.length > 0
+                ? currentUniDoc[0].status
+                : "NOT_SUBMITTED";
             return (
               <TableRow key={doc.documentR.doc_id}>
                 <TableCell className="font-medium text-[#34495e]">
@@ -301,6 +312,7 @@ function DocumentList({ documents }: { documents: UniversityApplication }) {
                               state: {
                                 application_id,
                                 doc,
+                                currentUniDoc,
                               },
                             }
                           );
