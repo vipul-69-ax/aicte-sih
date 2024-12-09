@@ -53,7 +53,7 @@ class Logger {
                 await this.pushToDB();
             }
 
-            else retry = 3;
+            else this.retry = 3;
         }
 
     }

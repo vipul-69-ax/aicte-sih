@@ -126,7 +126,7 @@ model UniversityDocuments {
   uni_application_id String
   doc_id             String
   errors             Json?
-  extractedTexts     String?
+  extractedTexts     Json?
   uni_doc_uri        String?
   timestamp          DateTime              @default(now())
   messages           Json?

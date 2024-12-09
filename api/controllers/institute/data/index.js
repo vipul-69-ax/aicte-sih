@@ -69,7 +69,7 @@ const start_new_application = async (req, res) => {
                 uni_application_id: application.uni_application_id, application_name: application.application_name, application_desc: application.application_description, application_id: application.application_id, universityId: institute_id
             }
         });
-        actionLogger.log(new Log(Date.now(), applicationRes.uni_application_id, undefined, undefined, LogAction.APP_CREATED, Doer.UNIVERSITY, LogObject.APPLICATION));
+        actionLogger.log(new Log(new Date(), applicationRes.uni_application_id, undefined, undefined, LogAction.APP_CREATED, Doer.UNIVERSITY, LogObject.APPLICATION));
         res.status(200).json({
             id: applicationRes.uni_application_id,
             success: true,
@@ -144,7 +144,6 @@ const get_application_document_by_id = async (req, res) => {
         if (!documents) {
             return res.status(404).json({ error: "No application found with the given Application ID for the given instituteID." });
         }
-
         res.status(200).json({
             success: true,
             data: documents,
@@ -155,10 +154,27 @@ const get_application_document_by_id = async (req, res) => {
     }
 }
 
-const docUpload = async (uni_application_id, doc_id, uni_doc_uri, errors) => {
+const getUniversityDocumentBy_doc_id = async (req, res) => {
+    const { doc_id } = req.body;
     try {
-        const document = await prisma.UniversityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: errors, status: "SUBMITTED" } })
-        await actionLogger.log(new Log(Date.now(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
+        const documents = await prisma.universityDocuments.findMany({ where: { doc_id: doc_id }, include: { document: true } });
+        return res.status(200).json({ data: documents });
+    }
+    catch (err) {
+        console.log("getUniversityDOCBYdoc_id", err);
+        res.status(500).json({ errors: err })
+    }
+}
+
+const docUpload = async (uni_application_id, doc_id, uni_doc_uri, response) => {
+    try {
+        const document = await prisma.$transaction(async (prisma) => {
+            await prisma.universityDocuments.updateMany({ where: { uni_application_id: uni_application_id, doc_id: doc_id }, data: { status: "REJECTED" } });
+            
+            return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: response?.data.layout_issues, extractedTexts: response?.data?.placeholder_values, status: "SUBMITTED" }, include: { document: true } });
+        })
+        await actionLogger.log(new Log(new Date(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
+        return document;
     }
     catch (err) {
         console.error(err);
@@ -174,8 +190,35 @@ const document_analysis = async (req, res) => {
             template_url: req.body.formatId,
             filled_url: req.body.uni_doc_uri
         });
-
+        const layoutIssues = response.data.layout_issues || [];
+        layoutErrors = [];
+        layoutIssues.forEach((issue, idx) => {
+            layoutErrors.push({
+                content: {
+                    text: issue.description,
+                },
+                position: {
+                    boundingRect: {
+                        x1: issue.location?.[0] || 0,
+                        y1: issue.location?.[1] || 0,
+                        x2: issue.location?.[2] || 0,
+                        y2: issue.location?.[3] || 0,
+                        width: (issue.location?.[2] || 0) - (issue.location?.[0] || 0),
+                        height: (issue.location?.[3] || 0) - (issue.location?.[1] || 0),
+                        pageNumber: issue.page || 1,
+                    },
+                    rects: [],
+                    pageNumber: issue.page || 1,
+                },
+                comment: issue.description,
+                id: `error-${idx + 1}`,
+            });
+        });
+        response.data.layout_issues = layoutErrors;
         // Sending the response back to the client with the data
+        const document = await docUpload(uni_application_id, doc_id, uni_doc_uri, response);
+        response.data["currentUniDoc"] = document;
+        console.log(response.data);
         res.status(200).json({
             success: true,
             data: response.data,
@@ -190,8 +233,7 @@ const document_analysis = async (req, res) => {
         });
     }
     finally {
-        console.log("uploading")
-        await docUpload(uni_application_id, doc_id, uni_doc_uri, response.data);
+        console.log("uploading");
     }
 };
 
