@@ -70,6 +70,7 @@ async function seed() {
 
     for (const application of appTypes) {
         // Create ApplicationTypes record
+        console.log(application)
         const appType = await prisma.applicationTypes.create({
             data: {
                 application_id: application.application_id,
