@@ -3,7 +3,8 @@ from fastapi.responses import JSONResponse
 from app.routers import chat_router, detect_router
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
-from app.services.detect.blueprint import ImageURL, download_image, extract_dimensions, calculate_area
+from app.services.detect.blueprint import ImageURL, download_image, extract_dimensions
+
 app = FastAPI()
 
 app.add_middleware(
@@ -14,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],  # e.g., ["Authorization", "Content-Type"]
 )
 
-app.include_router(chat_router.router)
 app.include_router(detect_router.router)
 
 groq_api_key = "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"
@@ -144,7 +144,7 @@ async def calculate_room_area_from_url(data: ImageURL):
         width, height = extract_dimensions(image)
 
         # Calculate the area
-        area = calculate_area(width, height)
+        area = width * height
 
         return JSONResponse(
             content={
@@ -155,3 +155,26 @@ async def calculate_room_area_from_url(data: ImageURL):
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error: {e}")
+
+from fastapi import APIRouter, HTTPException
+import logging
+from app.utils.pdf_compare_utils import check_with_groq, compare_layouts
+from app.utils.index import PDFComparisonRequest, download_pdf
+
+router = APIRouter()
+logging.basicConfig(level=logging.INFO)
+
+@app.post("/chat/comparison")
+async def compare_pdfs(request: PDFComparisonRequest):
+    try:
+        template_path = await download_pdf(request.template_url)
+        filled_path = await download_pdf(request.filled_url)
+        layouts_similar, placeholder_values, layout_issues = compare_layouts(template_path, filled_path)
+        placeholder_values = check_with_groq(placeholder_values)
+        result = {"layouts_similar": layouts_similar, "placeholder_values": placeholder_values}
+        if not layouts_similar:
+            result["layout_issues"] = layout_issues
+        return result
+    except Exception as e:
+        logging.error(f"Error processing PDFs: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
