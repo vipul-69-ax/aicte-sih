@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from app.routers import chat_router, detect_router
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
+from app.services.detect.blueprint import ImageURL, download_image, extract_dimensions, calculate_area
 app = FastAPI()
 
 app.add_middleware(
@@ -14,6 +16,8 @@ app.add_middleware(
 
 app.include_router(chat_router.router)
 app.include_router(detect_router.router)
+
+groq_api_key = "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"
 
 @app.get("/")
 def read_root():
@@ -51,7 +55,6 @@ async def websocket_endpoint(websocket: WebSocket):
         print("WebSocket disconnected")
 
 
-groq_api_key = "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"
 
 import json
 import logging
@@ -123,3 +126,32 @@ async def chat_pdf(websocket: WebSocket):
         logging.info("WebSocket connection closed")
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
+
+@app.post("/calculate-room-area")
+async def calculate_room_area_from_url(data: ImageURL):
+    """
+    Endpoint to calculate the room's outer area from a blueprint image URL.
+    Args:
+        data (ImageURL): The URL of the blueprint image.
+    Returns:
+        JSONResponse: The dimensions and area of the room.
+    """
+    try:
+        # Download the image from the provided URL
+        image = download_image(data.url)
+
+        # Extract dimensions from the blueprint
+        width, height = extract_dimensions(image)
+
+        # Calculate the area
+        area = calculate_area(width, height)
+
+        return JSONResponse(
+            content={
+                "width (ft)": round(width, 2),
+                "height (ft)": round(height, 2),
+                "area (sq ft)": round(area, 2),
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error: {e}")
