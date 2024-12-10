@@ -150,7 +150,7 @@ def compare_layouts(pdf1_path, pdf2_path):
   try:
     doc1 = fitz.open(pdf1_path)
     doc2 = fitz.open(pdf2_path)
-
+    
     all_placeholder_values = {}
     layout_issues = []
 
@@ -255,4 +255,38 @@ Ensure that your analysis is balanced and considers the possibility of valid but
     except Exception as e:
         logging.error(f"Error finding bounding box: {e}")
         return placeholder_values
+
+
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+# Load pre-trained model and tokenizer
+model_name = "nlpaueb/legal-bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+def preprocess_text(text):
+    # Tokenize and encode the text
+    inputs = tokenizer(text, padding=True, truncation=True, return_tensors="pt")
+    return inputs
+
+def classify_text(text):
+    # Preprocess the input text
+    inputs = preprocess_text(text)
+    
+    # Make prediction
+    with torch.no_grad():
+        outputs = model(**inputs)
+    
+    # Get the predicted class (0: non-legal, 1: legal)
+    predicted_class = torch.argmax(outputs.logits, dim=1).item()
+    
+    # Get the confidence score
+    confidence = torch.softmax(outputs.logits, dim=1)[0][predicted_class].item()
+    
+    # Return the result
+    if predicted_class == 1:
+        return True
+    else:
+        return False
 

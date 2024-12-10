@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 from app.services.detect.blueprint import calculate_building_area, ImageUrl
+from app.utils.pdf_compare_utils import classify_text
 
 app = FastAPI()
 
@@ -207,3 +208,8 @@ async def detect_objects(image_request):
         raise HTTPException(status_code=400, detail=f"Error downloading image: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
+
+from pydantic import BaseModel
+class LegalText(BaseModel):
+    text:str
+
