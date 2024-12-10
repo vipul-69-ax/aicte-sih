@@ -16,6 +16,7 @@ import InstituteOtpForm from "./pages/institute/auth/otp";
 import { api } from "./lib/utils";
 import UploadLegalDocument from "./pages/institute/applications/UploadDocument";
 import ErrorFix from "./pages/institute/applications/ErrorFixPage";
+import Infrastructure from "./pages/institute/dashboard/infrastructure";
 
 export const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ export default function App() {
               element={<Navigate to="/institute/dashboard" replace />}
             />
             <Route path="dashboard" element={<AICTEDashboard />} />
+            <Route path="infrastructure" element={<Infrastructure />} />
             <Route path="applications" element={<InstituteApplication />} />
             <Route path="upload-document" element={<UploadLegalDocument />} />
             <Route path="applications/:id" element={<ApplicationData />} />

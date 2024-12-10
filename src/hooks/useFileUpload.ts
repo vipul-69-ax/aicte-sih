@@ -31,9 +31,12 @@ export function useFileUpload() {
       const { data: { publicUrl } } = supabase.storage
         .from('sih')
         .getPublicUrl(data.path)
-
+      
       return { downloadUrl: publicUrl }
     },
+    onError:(err)=>{
+      console.log(JSON.stringify(err))
+    }
   })
 }
 

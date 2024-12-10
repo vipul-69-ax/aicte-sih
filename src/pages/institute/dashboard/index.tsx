@@ -42,7 +42,6 @@ import { PDFViewer } from "@/components/PdfViewer";
 import { ApplicationSubmissionForm } from "@/components/ApplicationSubmissionForm";
 import {
   SubmitUniversityApplication,
-  SubmitApplicationDocument,
 } from "@/schemas/applicationSchema";
 import { v4 as uuid4 } from "uuid";
 import { useInstituteData, useInstituteStore } from "@/hooks/useInstituteData";
@@ -51,6 +50,7 @@ import { useApplicationUpload } from "@/hooks/useApplication";
 import { Skeleton } from "@/components/ui/skeleton";
 import Settings from "../settings";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Separator } from "@/components/ui/separator";
 
 const typedApplicationTypes: ApplicationType[] = applicationTypes;
 
@@ -426,6 +426,17 @@ const MainContent: React.FC<MainContentProps> = ({
               />
             </DialogContent>
           </Dialog>
+          <div className="div">
+            <Separator className = "my-4"/>
+            <Button onClick={()=>{
+              navigate("/institute/infrastructure")
+            }}>
+              Verify Infrastructure
+            </Button>
+            <Button className="ml-4">
+              Verify Infrastructure
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
