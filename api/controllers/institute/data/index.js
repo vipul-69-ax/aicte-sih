@@ -181,8 +181,8 @@ const docUpload = async (uni_application_id, doc_id, uni_doc_uri, response) => {
         actionLogger.error(`${uni_doc_uri} failed creating doc for application_id ${uni_application_id}`);
     }
 }
+const FASTAPIURL = "http://localhost:8000";
 const document_analysis = async (req, res) => {
-    const FASTAPIURL = "http://localhost:8000";
     const { uni_application_id, doc_id, uni_doc_uri } = req.body;
     let response;
     try {
@@ -238,4 +238,20 @@ const document_analysis = async (req, res) => {
 };
 
 
-module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication, document_analysis }
+const validate_university_image=async(req, res)=>{
+    const data = req.body
+
+    try{
+        const response = await axios.post(`${FASTAPIURL}/detect_institute_image`, {
+            image_request:{
+                url:data.url
+            }
+        })
+        console.log(response)
+    }
+    catch(err){
+
+    }
+}
+
+module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication, document_analysis, validate_university_image }
