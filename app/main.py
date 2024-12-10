@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from app.routers import chat_router, detect_router
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 from app.services.detect.blueprint import ImageURL, download_image, extract_dimensions
@@ -14,8 +13,6 @@ app.add_middleware(
     allow_methods=["*"],  # e.g., ["GET", "POST", "OPTIONS"]
     allow_headers=["*"],  # e.g., ["Authorization", "Content-Type"]
 )
-
-app.include_router(detect_router.router)
 
 groq_api_key = "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"
 
@@ -178,3 +175,44 @@ async def compare_pdfs(request: PDFComparisonRequest):
     except Exception as e:
         logging.error(f"Error processing PDFs: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+from app.services.detect.object import model, process_image
+
+@app.post("/detect_institute_image")
+async def detect_objects(image_request):
+    try:
+        # Download image from URL
+        print(image_request)
+        response = requests.get(image_request.url)
+        response.raise_for_status()
+        img = process_image(response.content)
+        
+        # Run inference
+        results = model(img)
+        
+        # Process results
+        detections = []
+        for result in results:
+            boxes = result.boxes
+            for box in boxes:
+                detection = {
+                    "bbox": box.xyxy[0].tolist(),  # Convert bbox to list
+                    "confidence": float(box.conf),  # Convert confidence to float
+                    "class": int(box.cls),  # Get predicted class
+                    "class_name": result.names[int(box.cls)]  # Get class name
+                }
+                detections.append(detection)
+        
+        return {
+            "status": "success",
+            "detections": detections,
+            "model_info": {
+                "device": str(next(model.parameters()).device),
+                "num_detections": len(detections)
+            }
+        }
+        
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Error downloading image: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
