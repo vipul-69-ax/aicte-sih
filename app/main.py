@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
-from app.services.detect.blueprint import ImageURL, download_image, extract_dimensions
+from app.services.detect.blueprint import calculate_building_area, ImageUrl
 
 app = FastAPI()
 
@@ -134,7 +134,7 @@ async def chat_pdf(websocket: WebSocket):
 
 
 @app.post("/calculate-room-area")
-async def calculate_room_area_from_url(data: ImageURL):
+async def calculate_room_area_from_url(data : ImageUrl):
     """
     Endpoint to calculate the room's outer area from a blueprint image URL.
     Args:
@@ -144,20 +144,10 @@ async def calculate_room_area_from_url(data: ImageURL):
     """
     try:
         # Download the image from the provided URL
-        image = download_image(data.url)
-
-        # Extract dimensions from the blueprint
-        width, height = extract_dimensions(image)
-
-        # Calculate the area
-        area = width * height
-
+        dimensions = calculate_building_area(data.url)
+        print(dimensions)
         return JSONResponse(
-            content={
-                "width (ft)": round(width, 2),
-                "height (ft)": round(height, 2),
-                "area (sq ft)": round(area, 2),
-            }
+            dimensions
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error: {e}")

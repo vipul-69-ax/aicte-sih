@@ -1,70 +1,61 @@
-import cv2
-import numpy as np
-import easyocr
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import os
+import base64
 import requests
-import re
+from groq import Groq
+from pydantic import BaseModel
 
-app = FastAPI()
+# Initialize Groq client
+client = Groq(
+    api_key="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",
+)
 
-class ImageURL(BaseModel):
-    url: str
+class ImageUrl(BaseModel):
+    url:str
 
-reader = easyocr.Reader(["en"], gpu=False)  # Initialize EasyOCR Reader
+def encode_image_from_url(image_url):
+    response = requests.get(image_url)
+    return base64.b64encode(response.content).decode('utf-8')
 
-def download_image(url):
+def calculate_building_area(image_url):
+    # Encode the image
+    print(image_url)
+    base64_image = encode_image_from_url(image_url)
+
+    # Prepare the prompt
+    prompt = f"""
+    Analyze the following blueprint image and calculate the outer area of the building:
+    [IMAGE]
+
+    Please provide the following information:
+    1. A brief description of the building layout
+    2. The dimensions of the building (length and width)
+    3. The calculated outer area of the building in square meters
+
+    Output Format:
+    JSON(
+        length(in m),
+        width(in m),
+        area(in m),
+        description
+    )
+    The url of image is "data:image/jpeg;base64,{base64_image}"
+    Respond in a structured format.
     """
-    Downloads an image from a given URL.
-    Args:
-        url (str): URL of the image.
-    Returns:
-        numpy.ndarray: The downloaded image as a numpy array.
-    """
-    try:
-        response = requests.get(url, stream=True)
-        response.raise_for_status()  # Raise exception for HTTP errors
-        image_data = np.frombuffer(response.content, np.uint8)
-        image = cv2.imdecode(image_data, cv2.IMREAD_COLOR)
-        return image
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error downloading image: {e}")
 
-def extract_dimensions(image):
-    """
-    Uses EasyOCR to extract text and identifies potential dimensions.
-    Args:
-        image (numpy.ndarray): Image of the blueprint.
-    Returns:
-        tuple: Width and height of the room (in feet or meters).
-    """
-    # Convert image to grayscale for better OCR performance
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Make the API call
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt}
+                ],
+            }
+        ],
+        model="llama3-8b-8192",
+        max_tokens=1000,
+        response_format={"type": "json_object"},
 
-    # Use EasyOCR to extract text
-    results = reader.readtext(gray)
-
-    # Extract text and filter for dimensions
-    dimension_texts = []
-    for _, text, _ in results:
-        if re.search(r"(\d+['″′xX×.\s]+)", text):  # Match dimension-like text
-            dimension_texts.append(text)
-
-    # If we find less than two dimensions, raise an error
-    if len(dimension_texts) < 2:
-        raise ValueError("Could not find sufficient dimensions in the blueprint.")
-
-    # Extract and process dimensions
-    dimensions = []
-    for dim_text in dimension_texts:
-        # Parse dimension values (e.g., '8′' to 8, '10.2m' to 10.2, etc.)
-        match = re.search(r"(\d+(\.\d+)?)", dim_text)
-        if match:
-            dimensions.append(float(match.group(1)))
-
-    # Sort and pick the two largest dimensions as width and height
-    dimensions.sort(reverse=True)
-    width, height = dimensions[:2]
-
-    return width, height
-
+    )
+    # Extract and return the response
+    return chat_completion.choices[0].message.content
