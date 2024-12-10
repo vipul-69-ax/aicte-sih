@@ -87,7 +87,16 @@ export default function AICTEVerificationPage() {
             console.log(_r)
         }
     })
-    
+    institute.map(async(img)=>{
+      console.log(img)
+      const resp = await mutateAsync(img)
+      alert(resp?.downloadUrl)
+      if(resp?.downloadUrl){
+          const _r = await validate(resp?.downloadUrl)
+          console.log(_r)
+      }
+  })
+  
     // Add your submission logic here
   }
 

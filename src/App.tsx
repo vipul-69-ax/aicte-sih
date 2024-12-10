@@ -17,6 +17,8 @@ import { api } from "./lib/utils";
 import UploadLegalDocument from "./pages/institute/applications/UploadDocument";
 import ErrorFix from "./pages/institute/applications/ErrorFixPage";
 import Infrastructure from "./pages/institute/dashboard/infrastructure";
+import AdminDashboard from "./pages/admin";
+import Evaluator from "./pages/evaluator";
 
 export const queryClient = new QueryClient();
 
@@ -76,7 +78,6 @@ export default function App() {
               element={<Navigate to="/institute/dashboard" replace />}
             />
             <Route path="dashboard" element={<AICTEDashboard />} />
-            <Route path="infrastructure" element={<Infrastructure />} />
             <Route path="applications" element={<InstituteApplication />} />
             <Route path="upload-document" element={<UploadLegalDocument />} />
             <Route path="applications/:id" element={<ApplicationData />} />
@@ -84,7 +85,11 @@ export default function App() {
             <Route path="error-fix" element={<ErrorFix />} />
           </Route>
         )}
+        <Route path="infrastructure" element={<Infrastructure />} />
+        <Route path="/admin" element={<AdminDashboard/>}>
 
+        </Route>
+        <Route path="/evaluator" element={<Evaluator/>}/>
         {/* Catch-all route */}
         <Route
           path="*"
