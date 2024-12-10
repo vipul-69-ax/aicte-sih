@@ -238,20 +238,63 @@ const document_analysis = async (req, res) => {
 };
 
 
-const validate_university_image=async(req, res)=>{
-    const data = req.body
+const validate_university_image = async (req, res) => {
+    const { url } = req.body;
 
-    try{
+    if (!url) {
+        return res.status(400).json({ message: "URL is required" });
+    }
+
+    try {
         const response = await axios.post(`${FASTAPIURL}/detect_institute_image`, {
-            image_request:{
-                url:data.url
-            }
-        })
-        console.log(response)
-    }
-    catch(err){
+            image_request: { url }
+        });
 
-    }
-}
+        if (response.status === 200 && response.data) {
+            return res.status(200).json({ message: "Image validated successfully", data: response.data });
+        } else {
+            return res.status(500).json({ message: "Unexpected response from the image detection service" });
+        }
+    } catch (error) {
+        console.error("Error validating image:", error.message);
 
-module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication, document_analysis, validate_university_image }
+        if (error.response) {
+            return res.status(error.response.status).json({
+                message: error.response.data.message || "An error occurred while processing the request",
+            });
+        }
+
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+const validate_blueprint = async (req, res) => {
+    const { url } = req.body;
+
+    if (!url) {
+        return res.status(400).json({ message: "URL is required" });
+    }
+
+    try {
+        const response = await axios.post(`${FASTAPIURL}/validate_blueprint`, {url});
+
+        if (response.status === 200 && response.data) {
+            return res.status(200).json({ message: "Image validated successfully", data: response.data });
+        } else {
+            return res.status(500).json({ message: "Unexpected response from the image detection service" });
+        }
+    } catch (error) {
+        console.error("Error validating image:", error.message);
+
+        if (error.response) {
+            return res.status(error.response.status).json({
+                message: error.response.data.message || "An error occurred while processing the request",
+            });
+        }
+
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+module.exports = { get_institute_data, start_new_application, get_applications, get_application_document_by_id, availableApplication, document_analysis, validate_university_image, validate_blueprint }
