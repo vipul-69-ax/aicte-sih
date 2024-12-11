@@ -16,6 +16,46 @@ interface UploadResult {
   downloadUrl: string
 }
 
+import CryptoJS from 'crypto-js'
+
+const encrypt_file=(file:File)=>{
+  const wordArray = CryptoJS.lib.WordArray.create(file);
+  const encrypted = CryptoJS.AES.encrypt(wordArray, "ENCRYPT_KEY").toString();
+  return encrypted
+}
+
+const decryptFile=async(fileURL:string)=>{
+  try {
+    // Fetch the encrypted file from the Supabase URL
+    const response = await fetch(fileURL);
+    if (!response.ok) {
+      alert("Failed to fetch the file from the provided URL.");
+      return;
+    }
+
+    const encryptedData = await response.text(); // Assuming the encrypted file is Base64 text
+
+    // Decrypt the encrypted data
+    const bytes = CryptoJS.AES.decrypt(encryptedData, "ENCRYPTED");
+    const decryptedBase64 = bytes.toString(CryptoJS.enc.Utf8);
+
+    // Convert Base64 to a Blob
+    const binaryData = atob(decryptedBase64);
+    const buffer = new Uint8Array(binaryData.length);
+    for (let i = 0; i < binaryData.length; i++) {
+      buffer[i] = binaryData.charCodeAt(i);
+    }
+
+    const blob = new Blob([buffer], { type: "application/pdf" });
+
+    // Create an object URL for the decrypted file
+    return URL.createObjectURL(blob);
+    
+  } catch (error) {
+    console.error("Decryption failed:", error);
+    alert("Failed to decrypt the file. Check the key or file data.");
+  }
+}
 export function useFileUpload() {
   return useMutation<UploadResult, Error, File>({
     mutationFn: async (file: File) => {
@@ -55,7 +95,7 @@ export function useFileVerification() {
             return req.data
         },
     onSuccess: (data) => {
-      navigate("/institute/error-fix", { state: { currentUniDoc: [data.data.currentUniDoc] } });
+      // navigate("/institute/error-fix", { state: { currentUniDoc: [data.data.currentUniDoc] } });
         },
         onError:(err)=>{
             alert(JSON.stringify(err.message))

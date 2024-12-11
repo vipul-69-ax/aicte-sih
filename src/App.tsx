@@ -32,11 +32,8 @@ export default function App() {
         <Route
           path="/"
           element={
-            !token || !mode ? (
+            
               <LandingPage />
-            ) : (
-              <Navigate to="/institute/dashboard" replace />
-            )
           }
         />
 
@@ -72,7 +69,7 @@ export default function App() {
 
         {/* Institute Routes (Protected) */}
         {token && mode && (
-          <Route path="/institute">
+          <Route path="/institute" element={<Institute/>}>
             <Route
               index
               element={<Navigate to="/institute/dashboard" replace />}

@@ -216,6 +216,12 @@ export default function NOCApprovalDashboard() {
                   </TableCell>
                 </TableRow>
                 <TableRow>
+                  <TableCell className="font-medium">Check Type</TableCell>
+                  <TableCell>
+                    Forgery Detection
+                  </TableCell>
+                </TableRow>
+                <TableRow>
                   <TableCell className="font-medium">Approval Date</TableCell>
                   <TableCell>{document.approvalDate}</TableCell>
                 </TableRow>
@@ -226,45 +232,9 @@ export default function NOCApprovalDashboard() {
               </TableBody>
             </Table>
           </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Approval Analysis</h3>
-            <div className="flex items-center space-x-4">
-              <div className="text-2xl font-bold">
-                {document.approvalPercentage}%
-              </div>
-              <Progress
-                value={document.approvalPercentage}
-                className="w-full"
-              />
-            </div>
-          </div>
+          
         </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Detailed Breakdown</h3>
-          <ChartContainer
-            config={{
-              value: {
-                label: "Percentage",
-                color: "hsl(var(--chart-1))",
-              },
-            }}
-            className="h-[300px]"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsBarChart data={chartData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" domain={[0, 100]} />
-                <YAxis dataKey="name" type="category" width={150} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="value"
-                  fill="var(--color-value)"
-                  radius={[0, 4, 4, 0]}
-                />
-              </RechartsBarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
+        
         <div>
           <h3 className="text-lg font-semibold mb-2">Recommendations</h3>
           <ul className="list-disc pl-5 space-y-2">
