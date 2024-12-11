@@ -170,7 +170,7 @@ const docUpload = async (uni_application_id, doc_id, uni_doc_uri, response) => {
     try {
         const document = await prisma.$transaction(async (prisma) => {
             await prisma.universityDocuments.updateMany({ where: { uni_application_id: uni_application_id, doc_id: doc_id }, data: { status: "REJECTED" } });
-            
+
             return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: response?.data.layout_issues, extractedTexts: response?.data?.placeholder_values, status: "SUBMITTED" }, include: { document: true } });
         })
         await actionLogger.log(new Log(new Date(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
@@ -225,7 +225,6 @@ const document_analysis = async (req, res) => {
         });
     } catch (error) {
         console.error("Error in document_analysis:", error.message);
-
         // Responding with an appropriate error message and status code
         res.status(error.response?.status || 500).json({
             success: false,
@@ -238,19 +237,15 @@ const document_analysis = async (req, res) => {
 };
 
 
-const validate_university_image=async(req, res)=>{
+const validate_university_image = async (req, res) => {
     const data = req.body
-
-    try{
+    console.log(data);
+    try {
         const response = await axios.post(`${FASTAPIURL}/detect_institute_image`, {
-            image_request:{
-                url:data.url
-            }
+            url: data.url
         })
-        console.log(response)
     }
-    catch(err){
-
+    catch (err) {
     }
 }
 
