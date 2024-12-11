@@ -222,11 +222,6 @@ While resonping consider all the above points of prompt
    - `confidence`: A float between 0 and 1 indicating the confidence level of the validity assessment.
    - `issues`: An array of strings describing any identified issues. If the value is valid, this array should be empty.
    - `suggestions`: An array of strings providing potential fixes or improvements for invalid values. If the value is valid, this array should be empty.
-
-2. `overall_quality`: A float between 0 and 1 representing the overall quality of the placeholder values, calculated as the average of all confidence scores.
-
-3. `summary`: A brief string summarizing the analysis results, including the number of valid and invalid placeholders, and any notable patterns or issues observed across multiple placeholders.
-
 Ensure that your analysis is balanced and considers the possibility of valid but unconventional data. If you're unsure about the validity of a value, lean towards marking it as valid with a lower confidence score rather than immediately flagging it as invalid.
     """
 

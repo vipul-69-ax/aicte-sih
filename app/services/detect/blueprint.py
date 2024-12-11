@@ -58,4 +58,4 @@ def calculate_building_area(image_url):
 
     )
     # Extract and return the response
-    return chat_completion.choices[0].message.content
+    return chat_completion.choices[0].message.content   

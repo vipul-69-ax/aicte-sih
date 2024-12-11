@@ -134,7 +134,7 @@ async def chat_pdf(websocket: WebSocket):
         logging.error(f"Unexpected error: {e}")
 
 
-@app.post("/calculate-room-area")
+@app.post("/validate_blueprint")
 async def calculate_room_area_from_url(data : ImageUrl):
     """
     Endpoint to calculate the room's outer area from a blueprint image URL.
@@ -228,7 +228,4 @@ async def detect_objects(image_request: ImageComparisionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
 
-from pydantic import BaseModel
-class LegalText(BaseModel):
-    text:str
 
