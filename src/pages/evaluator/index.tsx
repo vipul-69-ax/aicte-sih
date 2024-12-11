@@ -1,10 +1,17 @@
-'use client'
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -13,26 +20,51 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { BarChart, FileText, User, Check, X, Clock, CheckCircle, XCircle } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  BarChart,
+  FileText,
+  User,
+  Check,
+  X,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart as RechartsBarChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 export default function NOCApprovalDashboard() {
-  const [selectedDocument, setSelectedDocument] = useState(null)
-  const [isVerified, setIsVerified] = useState(false)
-  const [showRejectionDialog, setShowRejectionDialog] = useState(false)
-  const [showRejectionConfirmationDialog, setShowRejectionConfirmationDialog] = useState(false)
-  const [showApprovalDialog, setShowApprovalDialog] = useState(false)
-  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false)
-  const [showFullImageDialog, setShowFullImageDialog] = useState(false)
-  const [rejectionReason, setRejectionReason] = useState("")
-  const [rejectionComments, setRejectionComments] = useState("")
-  const [showUniversityDialog, setShowUniversityDialog] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState("")
-  const [showEvaluatorInfo, setShowEvaluatorInfo] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [showRejectionConfirmationDialog, setShowRejectionConfirmationDialog] =
+    useState(false);
+  const [showApprovalDialog, setShowApprovalDialog] = useState(false);
+  const [showAnalysisDialog, setShowAnalysisDialog] = useState(false);
+  const [showFullImageDialog, setShowFullImageDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [rejectionComments, setRejectionComments] = useState("");
+  const [showUniversityDialog, setShowUniversityDialog] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [showEvaluatorInfo, setShowEvaluatorInfo] = useState(false);
 
   // Mock data - replace with actual data in a real application
   const user = {
@@ -43,26 +75,31 @@ export default function NOCApprovalDashboard() {
     teacherId: "AICTE-2024-VS1234",
     workingExperience: "5 years",
     totalDocumentsApproved: 1287,
-    lastLogin: "2024-12-03 14:30:00"
-  }
+    lastLogin: "2024-12-03 14:30:00",
+  };
 
   const approvalProgress = {
     approved: {
       count: 150,
       recentActivity: "Last approved: 10 minutes ago",
-      trend: "+5% this week"
+      trend: "+5% this week",
     },
     pending: {
       count: 30,
       oldestPending: "Oldest: 2 days ago",
-      urgentCount: 5
+      urgentCount: 5,
     },
     rejected: {
       count: 20,
       recentRejection: "Last rejected: 1 hour ago",
-      commonReason: "Incomplete documentation"
-    }
-  }
+      commonReason: "Incomplete documentation",
+    },
+    assigned: {
+      count: 45,
+      recentAssignment: "Last assigned: 30 minutes ago",
+      urgentCount: 3,
+    },
+  };
 
   const currentDocument = {
     id: "DOC5678",
@@ -72,91 +109,173 @@ export default function NOCApprovalDashboard() {
     type: "NOC Application",
     applicantName: "Vipul Mahajan",
     programName: "New Password/Forgotten Password",
-    completeness: 85
-  }
+    completeness: 85,
+  };
 
   const previousDocuments = [
-    { id: "DOC1234", universityId: "UNI001", universityName: "Sample University", approvalDate: "2023-05-10", approvalPercentage: 85, status: "Approved" },
-    { id: "DOC5678", universityId: "UNI002", universityName: "Test University", approvalDate: "2023-05-08", approvalPercentage: 92, status: "Approved" },
-    { id: "DOC9101", universityId: "UNI003", universityName: "Global University", approvalDate: "2023-05-05", approvalPercentage: 78, status: "Rejected" },
-  ]
+    {
+      id: "DOC1234",
+      universityId: "UNI001",
+      universityName: "Sample University",
+      approvalDate: "2023-05-10",
+      approvalPercentage: 85,
+      status: "Approved",
+    },
+    {
+      id: "DOC5678",
+      universityId: "UNI002",
+      universityName: "Test University",
+      approvalDate: "2023-05-08",
+      approvalPercentage: 92,
+      status: "Approved",
+    },
+    {
+      id: "DOC9101",
+      universityId: "UNI003",
+      universityName: "Global University",
+      approvalDate: "2023-05-05",
+      approvalPercentage: 78,
+      status: "Rejected",
+    },
+  ];
 
   const handleVerification = () => {
-    setIsVerified(!isVerified)
-  }
+    setIsVerified(!isVerified);
+  };
 
   const handleApprove = () => {
-    setShowApprovalDialog(true)
-  }
+    setShowApprovalDialog(true);
+  };
 
   const confirmApproval = () => {
-    setShowApprovalDialog(false)
-    setIsVerified(false)
-  }
+    setShowApprovalDialog(false);
+    setIsVerified(false);
+  };
 
   const handleReject = () => {
-    setShowRejectionDialog(true)
-  }
+    setShowRejectionDialog(true);
+  };
 
   const submitRejection = () => {
-    setShowRejectionDialog(false)
-    setShowRejectionConfirmationDialog(true)
-  }
+    setShowRejectionDialog(false);
+    setShowRejectionConfirmationDialog(true);
+  };
 
   const confirmRejection = () => {
-    setShowRejectionConfirmationDialog(false)
-    setRejectionReason("")
-    setRejectionComments("")
-    setIsVerified(false)
-  }
+    setShowRejectionConfirmationDialog(false);
+    setRejectionReason("");
+    setRejectionComments("");
+    setIsVerified(false);
+  };
 
   const handleAnalyze = (doc) => {
-    setSelectedDocument(doc)
-    setShowAnalysisDialog(true)
-  }
+    setSelectedDocument(doc);
+    setShowAnalysisDialog(true);
+  };
 
   const handleCardClick = (category) => {
-    setSelectedCategory(category)
-    setShowUniversityDialog(true)
-  }
+    setSelectedCategory(category);
+    setShowUniversityDialog(true);
+  };
 
   const toggleEvaluatorInfo = () => {
-    setShowEvaluatorInfo(!showEvaluatorInfo)
-  }
+    setShowEvaluatorInfo(!showEvaluatorInfo);
+  };
 
-  const AnalysisReport = ({ document }) => (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-semibold">Document Details</h3>
-        <p>Document ID: {document.id}</p>
-        <p>University: {document.universityName} (ID: {document.universityId})</p>
-        <p>Approval Date: {document.approvalDate}</p>
-        <p>Status: {document.status}</p>
+  const AnalysisReport = ({ document }) => {
+    const chartData = [
+      {
+        name: "Document Completeness",
+        value: Math.round(document.approvalPercentage * 0.4),
+      },
+      {
+        name: "Accuracy of Information",
+        value: Math.round(document.approvalPercentage * 0.3),
+      },
+      {
+        name: "Compliance with Guidelines",
+        value: Math.round(document.approvalPercentage * 0.3),
+      },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Document Details</h3>
+            <Table>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Document ID</TableCell>
+                  <TableCell>{document.id}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">University</TableCell>
+                  <TableCell>
+                    {document.universityName} (ID: {document.universityId})
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Approval Date</TableCell>
+                  <TableCell>{document.approvalDate}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Status</TableCell>
+                  <TableCell>{document.status}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Approval Analysis</h3>
+            <div className="flex items-center space-x-4">
+              <div className="text-2xl font-bold">
+                {document.approvalPercentage}%
+              </div>
+              <Progress
+                value={document.approvalPercentage}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Detailed Breakdown</h3>
+          <ChartContainer
+            config={{
+              value: {
+                label: "Percentage",
+                color: "hsl(var(--chart-1))",
+              },
+            }}
+            className="h-[300px]"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsBarChart data={chartData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 100]} />
+                <YAxis dataKey="name" type="category" width={150} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="value"
+                  fill="var(--color-value)"
+                  radius={[0, 4, 4, 0]}
+                />
+              </RechartsBarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Recommendations</h3>
+          <ul className="list-disc pl-5 space-y-2">
+            <li>Ensure all required fields are filled completely</li>
+            <li>Double-check the accuracy of key information</li>
+            <li>Review the latest NOC guidelines for full compliance</li>
+          </ul>
+        </div>
       </div>
-      <div>
-        <h3 className="text-lg font-semibold">Approval Analysis</h3>
-        <p>Overall Approval Percentage: {document.approvalPercentage}%</p>
-        <Progress value={document.approvalPercentage} className="w-full mt-2" />
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold">Detailed Breakdown</h3>
-        <ul className="list-disc pl-5">
-          <li>Document Completeness: {Math.round(document.approvalPercentage * 0.4)}%</li>
-          <li>Accuracy of Information: {Math.round(document.approvalPercentage * 0.3)}%</li>
-          <li>Compliance with Guidelines: {Math.round(document.approvalPercentage * 0.3)}%</li>
-        </ul>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold">Recommendations</h3>
-        <p>Based on the analysis, here are some recommendations:</p>
-        <ul className="list-disc pl-5">
-          <li>Ensure all required fields are filled completely</li>
-          <li>Double-check the accuracy of key information</li>
-          <li>Review the latest NOC guidelines for full compliance</li>
-        </ul>
-      </div>
-    </div>
-  )
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -165,7 +284,12 @@ export default function NOCApprovalDashboard() {
           <div className="flex items-center">
             <User className="h-10 w-10 text-gray-500 mr-3" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 cursor-pointer" onClick={toggleEvaluatorInfo}>{user.name}</h1>
+              <h1
+                className="text-2xl font-bold text-gray-900 cursor-pointer"
+                onClick={toggleEvaluatorInfo}
+              >
+                {user.name}
+              </h1>
               <p className="text-sm text-gray-600">{user.position}</p>
             </div>
           </div>
@@ -175,41 +299,95 @@ export default function NOCApprovalDashboard() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="cursor-pointer" onClick={() => handleCardClick("Approved")}>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Card
+              className="cursor-pointer"
+              onClick={() => handleCardClick("Approved")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Approved Documents</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Approved Documents
+                </CardTitle>
                 <Check className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{approvalProgress.approved.count}</div>
-                <p className="text-xs text-muted-foreground">{approvalProgress.approved.recentActivity}</p>
-                <p className="text-xs text-green-500">{approvalProgress.approved.trend}</p>
+                <div className="text-2xl font-bold">
+                  {approvalProgress.approved.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {approvalProgress.approved.recentActivity}
+                </p>
+                <p className="text-xs text-green-500">
+                  {approvalProgress.approved.trend}
+                </p>
               </CardContent>
             </Card>
-            <Card className="cursor-pointer" onClick={() => handleCardClick("Pending")}>
+            <Card
+              className="cursor-pointer"
+              onClick={() => handleCardClick("Pending")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Documents</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Pending Documents
+                </CardTitle>
                 <Clock className="h-4 w-4 text-yellow-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{approvalProgress.pending.count}</div>
-                <p className="text-xs text-muted-foreground">{approvalProgress.pending.oldestPending}</p>
-                <p className="text-xs text-yellow-500">{approvalProgress.pending.urgentCount} urgent</p>
+                <div className="text-2xl font-bold">
+                  {approvalProgress.pending.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {approvalProgress.pending.oldestPending}
+                </p>
+                <p className="text-xs text-yellow-500">
+                  {approvalProgress.pending.urgentCount} urgent
+                </p>
               </CardContent>
             </Card>
-            <Card className="cursor-pointer" onClick={() => handleCardClick("Rejected")}>
+            <Card
+              className="cursor-pointer"
+              onClick={() => handleCardClick("Rejected")}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Rejected Documents</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Rejected Documents
+                </CardTitle>
                 <X className="h-4 w-4 text-red-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{approvalProgress.rejected.count}</div>
-                <p className="text-xs text-muted-foreground">{approvalProgress.rejected.recentRejection}</p>
-                <p className="text-xs text-red-500">Common reason: {approvalProgress.rejected.commonReason}</p>
+                <div className="text-2xl font-bold">
+                  {approvalProgress.rejected.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {approvalProgress.rejected.recentRejection}
+                </p>
+                <p className="text-xs text-red-500">
+                  Common reason: {approvalProgress.rejected.commonReason}
+                </p>
+              </CardContent>
+            </Card>
+            <Card
+              className="cursor-pointer"
+              onClick={() => handleCardClick("Assigned")}
+            >
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Assigned Documents
+                </CardTitle>
+                <FileText className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {approvalProgress.assigned.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {approvalProgress.assigned.recentAssignment}
+                </p>
+                <p className="text-xs text-blue-500">
+                  {approvalProgress.assigned.urgentCount} urgent
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -221,23 +399,42 @@ export default function NOCApprovalDashboard() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Document ID</p>
-                  <p className="mt-1 text-lg font-semibold">{currentDocument.id}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Document ID
+                  </p>
+                  <p className="mt-1 text-lg font-semibold">
+                    {currentDocument.id}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Status</p>
-                  <p className="mt-1 text-lg font-semibold">{currentDocument.status}</p>
+                  <p className="mt-1 text-lg font-semibold">
+                    {currentDocument.status}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">University</p>
-                  <p className="mt-1 text-lg font-semibold">{currentDocument.university}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    University
+                  </p>
+                  <p className="mt-1 text-lg font-semibold">
+                    {currentDocument.university}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Submission Date</p>
-                  <p className="mt-1 text-lg font-semibold">{currentDocument.submissionDate}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Submission Date
+                  </p>
+                  <p className="mt-1 text-lg font-semibold">
+                    {currentDocument.submissionDate}
+                  </p>
                 </div>
               </div>
-              <Button className="mt-4" onClick={() => setShowFullImageDialog(true)}>View Document</Button>
+              <Button
+                className="mt-4"
+                onClick={() => setShowFullImageDialog(true)}
+              >
+                View Document
+              </Button>
             </CardContent>
           </Card>
 
@@ -268,19 +465,32 @@ export default function NOCApprovalDashboard() {
                       <TableCell>{doc.approvalDate}</TableCell>
                       <TableCell>
                         <div className="flex items-center">
-                          <span className="mr-2">{doc.approvalPercentage}%</span>
-                          <Progress value={doc.approvalPercentage} className="w-[60px]" />
+                          <span className="mr-2">
+                            {doc.approvalPercentage}%
+                          </span>
+                          <Progress
+                            value={doc.approvalPercentage}
+                            className="w-[60px]"
+                          />
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          doc.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            doc.status === "Approved"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
                           {doc.status}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm" onClick={() => handleAnalyze(doc)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAnalyze(doc)}
+                        >
                           <BarChart className="h-4 w-4 mr-2" />
                           Analyze
                         </Button>
@@ -288,7 +498,13 @@ export default function NOCApprovalDashboard() {
                       <TableCell>
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => setSelectedDocument(doc)}>View</Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedDocument(doc)}
+                            >
+                              View
+                            </Button>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
                             <DialogHeader>
@@ -299,14 +515,18 @@ export default function NOCApprovalDashboard() {
                             </DialogHeader>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                <img
+                                {/* <Image
                                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-8aM0wEAduDSlkSrTXn6s5EfRXmbQpa.png"
                                   alt="Affidavit Document"
+                                  width={800}
+                                  height={1000}
                                   className="w-full h-auto"
-                                />
+                                /> */}
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold mb-4">Document Information</h3>
+                                <h3 className="text-lg font-semibold mb-4">
+                                  Document Information
+                                </h3>
                                 <Table>
                                   <TableHeader>
                                     <TableRow>
@@ -321,7 +541,10 @@ export default function NOCApprovalDashboard() {
                                     </TableRow>
                                     <TableRow>
                                       <TableCell>Purpose</TableCell>
-                                      <TableCell>Creation of New Password/Forgotten Password</TableCell>
+                                      <TableCell>
+                                        Creation of New Password/Forgotten
+                                        Password
+                                      </TableCell>
                                     </TableRow>
                                     <TableRow>
                                       <TableCell>Applicant Name</TableCell>
@@ -329,7 +552,9 @@ export default function NOCApprovalDashboard() {
                                     </TableRow>
                                     <TableRow>
                                       <TableCell>Institution</TableCell>
-                                      <TableCell>Future Bright Academy</TableCell>
+                                      <TableCell>
+                                        Future Bright Academy
+                                      </TableCell>
                                     </TableRow>
                                     <TableRow>
                                       <TableCell>User ID</TableCell>
@@ -344,8 +569,12 @@ export default function NOCApprovalDashboard() {
                                       <TableCell>TXN0987654321</TableCell>
                                     </TableRow>
                                     <TableRow>
-                                      <TableCell>Verification Officer</TableCell>
-                                      <TableCell>Parth Gupta, AICTE Head Office</TableCell>
+                                      <TableCell>
+                                        Verification Officer
+                                      </TableCell>
+                                      <TableCell>
+                                        Parth Gupta, AICTE Head Office
+                                      </TableCell>
                                     </TableRow>
                                   </TableBody>
                                 </Table>
@@ -362,10 +591,9 @@ export default function NOCApprovalDashboard() {
           </Card>
         </div>
       </main>
-
       {/* Analysis Dialog */}
       <Dialog open={showAnalysisDialog} onOpenChange={setShowAnalysisDialog}>
-        <DialogContent className="sm:max-w-[625px]">
+        <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>Document Analysis</DialogTitle>
             <DialogDescription>
@@ -378,20 +606,24 @@ export default function NOCApprovalDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Rejection Dialog */}
       <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Reject Document</DialogTitle>
             <DialogDescription>
-              Please provide a reason for rejecting this document and any additional comments.
+              Please provide a reason for rejecting this document and any
+              additional comments.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="reason">Reason for Rejection</Label>
-              <RadioGroup id="reason" value={rejectionReason} onValueChange={setRejectionReason}>
+              <RadioGroup
+                id="reason"
+                value={rejectionReason}
+                onValueChange={setRejectionReason}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="incomplete" id="incomplete" />
                   <Label htmlFor="incomplete">Incomplete Documentation</Label>
@@ -402,7 +634,9 @@ export default function NOCApprovalDashboard() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="noncompliant" id="noncompliant" />
-                  <Label htmlFor="noncompliant">Non-compliant with Guidelines</Label>
+                  <Label htmlFor="noncompliant">
+                    Non-compliant with Guidelines
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="other" id="other" />
@@ -421,18 +655,26 @@ export default function NOCApprovalDashboard() {
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={() => setShowRejectionDialog(false)} variant="outline">
+            <Button
+              onClick={() => setShowRejectionDialog(false)}
+              variant="outline"
+            >
               Cancel
             </Button>
-            <Button onClick={submitRejection} className="bg-red-500 hover:bg-red-600">
+            <Button
+              onClick={submitRejection}
+              className="bg-red-500 hover:bg-red-600"
+            >
               Confirm Rejection
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Rejection Confirmation Dialog */}
-      <Dialog open={showRejectionConfirmationDialog} onOpenChange={setShowRejectionConfirmationDialog}>
+      <Dialog
+        open={showRejectionConfirmationDialog}
+        onOpenChange={setShowRejectionConfirmationDialog}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Document Rejected</DialogTitle>
@@ -447,13 +689,15 @@ export default function NOCApprovalDashboard() {
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={confirmRejection} className="bg-red-500 hover:bg-red-600">
+            <Button
+              onClick={confirmRejection}
+              className="bg-red-500 hover:bg-red-600"
+            >
               Close
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Approval Dialog */}
       <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
         <DialogContent className="sm:max-w-[425px]">
@@ -470,14 +714,16 @@ export default function NOCApprovalDashboard() {
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={confirmApproval} className="bg-green-500 hover:bg-green-600">
+            <Button
+              onClick={confirmApproval}
+              className="bg-green-500 hover:bg-green-600"
+            >
               Close
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {/* Full Image Dialog */}
+      Full Image Dialog
       <Dialog open={showFullImageDialog} onOpenChange={setShowFullImageDialog}>
         <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
           <DialogHeader>
@@ -488,13 +734,13 @@ export default function NOCApprovalDashboard() {
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Image
+              {/* <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-UEYOmZtNmaCfNVm6fUsGsVComAYWiL.png"
                 alt="Full Document View"
                 width={800}
                 height={1000}
                 className="w-full h-auto"
-              />
+              /> */}
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Key Elements</h3>
@@ -512,7 +758,9 @@ export default function NOCApprovalDashboard() {
                   </TableRow>
                   <TableRow>
                     <TableCell>Purpose</TableCell>
-                    <TableCell>Creation of New Password/Forgotten Password</TableCell>
+                    <TableCell>
+                      Creation of New Password/Forgotten Password
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Applicant Name</TableCell>
@@ -544,30 +792,45 @@ export default function NOCApprovalDashboard() {
           </div>
           <div className="mt-4">
             <div className="flex items-center space-x-2 mb-4">
-              <Checkbox id="verified" checked={isVerified} onCheckedChange={handleVerification} />
+              <Checkbox
+                id="verified"
+                checked={isVerified}
+                onCheckedChange={handleVerification}
+              />
               <Label htmlFor="verified">
                 I have verified all the information in this document
               </Label>
             </div>
             <div className="flex justify-end space-x-4">
-              <Button onClick={handleApprove} disabled={!isVerified} className="bg-green-500 hover:bg-green-600">
+              <Button
+                onClick={handleApprove}
+                disabled={!isVerified}
+                className="bg-green-500 hover:bg-green-600"
+              >
                 Approve
               </Button>
-              <Button onClick={handleReject} disabled={!isVerified} className="bg-red-500 hover:bg-red-600">
+              <Button
+                onClick={handleReject}
+                disabled={!isVerified}
+                className="bg-red-500 hover:bg-red-600"
+              >
                 Reject
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-
       {/* University Applications Dialog */}
-      <Dialog open={showUniversityDialog} onOpenChange={setShowUniversityDialog}>
+      <Dialog
+        open={showUniversityDialog}
+        onOpenChange={setShowUniversityDialog}
+      >
         <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>{selectedCategory} Applications</DialogTitle>
             <DialogDescription>
-              List of universities and their requested applications for NOC from AICTE
+              List of universities and their requested applications for NOC from
+              AICTE
             </DialogDescription>
           </DialogHeader>
           <Table>
@@ -583,14 +846,24 @@ export default function NOCApprovalDashboard() {
               {[...Array(10)].map((_, index) => (
                 <TableRow key={index}>
                   <TableCell>{`University ${index + 1}`}</TableCell>
-                  <TableCell>{`APP${Math.floor(1000 + Math.random() * 9000)}`}</TableCell>
-                  <TableCell>{`2024-${Math.floor(1 + Math.random() * 12).toString().padStart(2, '0')}-${Math.floor(1 + Math.random() * 28).toString().padStart(2, '0')}`}</TableCell>
+                  <TableCell>{`APP${Math.floor(
+                    1000 + Math.random() * 9000
+                  )}`}</TableCell>
+                  <TableCell>{`2024-${Math.floor(1 + Math.random() * 12)
+                    .toString()
+                    .padStart(2, "0")}-${Math.floor(1 + Math.random() * 28)
+                    .toString()
+                    .padStart(2, "0")}`}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      selectedCategory === "Approved" ? 'bg-green-100 text-green-800' :
-                      selectedCategory === "Pending" ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        selectedCategory === "Approved"
+                          ? "bg-green-100 text-green-800"
+                          : selectedCategory === "Pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {selectedCategory}
                     </span>
                   </TableCell>
@@ -599,44 +872,51 @@ export default function NOCApprovalDashboard() {
             </TableBody>
           </Table>
           <DialogFooter>
-            <Button onClick={() => setShowUniversityDialog(false)}>Close</Button>
+            <Button onClick={() => setShowUniversityDialog(false)}>
+              Close
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Evaluator Info Dialog */}
       <Dialog open={showEvaluatorInfo} onOpenChange={setShowEvaluatorInfo}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Evaluator Information</DialogTitle>
-            <DialogDescription>
-              Details about {user.name}
-            </DialogDescription>
+            <DialogDescription>Details about {user.name}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="teacherId" className="text-right">
                 Teacher ID
               </Label>
-              <p id="teacherId" className="col-span-2">{user.teacherId}</p>
+              <p id="teacherId" className="col-span-2">
+                {user.teacherId}
+              </p>
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="experience" className="text-right">
                 Working Experience
               </Label>
-              <p id="experience" className="col-span-2">{user.workingExperience}</p>
+              <p id="experience" className="col-span-2">
+                {user.workingExperience}
+              </p>
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="documentsApproved" className="text-right">
                 Total Documents Approved
               </Label>
-              <p id="documentsApproved" className="col-span-2">{user.totalDocumentsApproved}</p>
+              <p id="documentsApproved" className="col-span-2">
+                {user.totalDocumentsApproved}
+              </p>
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="lastLogin" className="text-right">
                 Last Login
               </Label>
-              <p id="lastLogin" className="col-span-2">{user.lastLogin}</p>
+              <p id="lastLogin" className="col-span-2">
+                {user.lastLogin}
+              </p>
             </div>
           </div>
           <DialogFooter>
@@ -645,5 +925,5 @@ export default function NOCApprovalDashboard() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
