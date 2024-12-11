@@ -91,11 +91,11 @@ export function useFileVerification() {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: async (verifyBody: VerifyBody)=>{
-            const req = await api.post(`${SERVER_URL}/institute/data/document_analysis`,verifyBody)
-            return req.data
+      const req = await api.post(`${SERVER_URL}/institute/data/document_analysis`, verifyBody)
+      return { data: req.data, verifyBody }; // Include verifyBody in the returned data
         },
-    onSuccess: (data) => {
-      // navigate("/institute/error-fix", { state: { currentUniDoc: [data.data.currentUniDoc] } });
+    onSuccess: ({data,verifyBody}) => {
+      navigate("/institute/error-fix", { state: { currentUniDoc: [data.data.currentUniDoc],application_id:verifyBody.uni_application_id } });
         },
         onError:(err)=>{
             alert(JSON.stringify(err.message))

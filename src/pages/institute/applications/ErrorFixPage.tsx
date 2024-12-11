@@ -146,10 +146,13 @@ export default function ErrorFixPage() {
   const [editorError, setEditorError] = useState<string | null>(null);
   const {
     currentUniDoc,
+    application_id,
   }: {
     currentUniDoc: ApplicationDocument[];
+    application_id: string;
   } = useLocation().state;
   console.log("currentUniDoc", currentUniDoc);
+  console.log("currentApp", application_id);
   return (
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold mb-6">
@@ -162,7 +165,9 @@ export default function ErrorFixPage() {
               currentUniDoc[0].uni_doc_uri ??
               "https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"
             }
-            errors={currentUniDoc[0].errors as ErrorHighlight[]}
+            errors={
+              (currentUniDoc[0].errors as ErrorHighlight[]) ?? errorHighlights
+            }
           />
         </div>
         <div className="">
@@ -176,6 +181,9 @@ export default function ErrorFixPage() {
         </div>
       </div>
       <PdfEditor
+        format_uri={currentUniDoc[0].document.format_uri}
+        doc_id={currentUniDoc[0].doc_id}
+        uni_application_id={application_id}
         url={
           currentUniDoc[0].uni_doc_uri ??
           "https://lalhrowagdujluyyztsd.supabase.co/storage/v1/object/public/sih/1733390964242_sample.pdf_0.vd9x3ovmhz"

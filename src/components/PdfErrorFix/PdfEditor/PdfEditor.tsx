@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { extractTextFromPDF, FormattedTextBlock } from "@/lib/pdfjs-setup";
 import { MarkdownEditor } from "./MarkdownEditor";
-import { Loader2, Download, Upload } from "lucide-react";
+import { Loader2, Download, Upload, FileUp } from "lucide-react";
 import { usePDFConverter } from "@/hooks/usePdfConverter";
 import { Button } from "@/components/ui/button";
+import { useFileUpload, useFileVerification } from "@/hooks/useFileUpload";
 
 interface PDFMarkdownConverterProps {
   url: string;
+  doc_id: string;
   onError?: (error: string) => void;
+  format_uri: string;
+  uni_application_id: string;
 }
 
 const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
   url: initialUrl,
   onError,
+  format_uri,
+  uni_application_id,
+  doc_id,
 }) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState<FormattedTextBlock[]>([]);
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
   const { convertToPDF, isConverting, error: pdfError } = usePDFConverter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fileUploadMutation = useFileUpload();
+  const fileVerificationMutation = useFileVerification();
 
   const convertPDF = async (url: string) => {
     try {
@@ -46,16 +57,45 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
     }
   }, [pdfError, onError]);
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     try {
-      const blob = convertToPDF(content);
+      const blob = await convertToPDF(content);
       if (blob == null) throw Error("Cannot upload pdf");
-      else {
-        //TODO handle upload of supabase
-      }
+
+      const file = new File([blob], "converted.pdf", {
+        type: "application/pdf",
+      });
+      const result = await fileUploadMutation.mutateAsync(file);
+
+      await fileVerificationMutation.mutateAsync({
+        uni_doc_uri: result.downloadUrl,
+        doc_id: doc_id, // You might want to generate a unique ID here
+        formatId: format_uri,
+        uni_application_id: uni_application_id,
+      });
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      onError?.("Failed to upload and verify the PDF.");
     }
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const result = await fileUploadMutation.mutateAsync(file);
+        setCurrentUrl(result.downloadUrl);
+      } catch (err) {
+        console.error(err);
+        onError?.("Failed to upload the file.");
+      }
+    }
+  };
+
+  const handleChooseFile = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -64,27 +104,40 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
         <h2 className="text-lg font-medium text-gray-900">PDF Content</h2>
         <div className="flex space-x-2">
           {content.length > 0 && (
-            <>
-              <button
-                onClick={handleUpload}
-                disabled={isConverting}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-              >
-                {isConverting ? (
-                  <>
-                    <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Uploading.....
-                  </>
-                ) : (
-                  <>
-                    <Upload className="-ml-1 mr-2 h-4 w-4" />
-                    Upload PDF
-                  </>
-                )}
-              </button>
-            </>
+            <Button
+              onClick={handleUpload}
+              disabled={
+                isConverting ||
+                fileUploadMutation.isLoading ||
+                fileVerificationMutation.isLoading
+              }
+            >
+              {isConverting ||
+              fileUploadMutation.isLoading ||
+              fileVerificationMutation.isLoading ? (
+                <>
+                  <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="-ml-1 mr-2 h-4 w-4" />
+                  Upload PDF
+                </>
+              )}
+            </Button>
           )}
-          <Button>Choose from files</Button>
+          <Button onClick={handleChooseFile}>
+            <FileUp className="-ml-1 mr-2 h-4 w-4" />
+            Choose from files
+          </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="application/pdf"
+            className="hidden"
+          />
         </div>
       </div>
 
