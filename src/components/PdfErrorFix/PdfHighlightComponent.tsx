@@ -146,9 +146,10 @@ export const ErrorViewer: React.FC<PdfViewerProps> = ({ url, errors }) => {
     );
   }
 
-  const currentHighlights = highlights.filter(
-    (highlight) => highlight.position.pageNumber === currentPage
-  );
+  const currentHighlights =
+    highlights?.filter(
+      (highlight) => highlight.position.pageNumber === currentPage
+    ) ?? [];
   console.log("currentHighlights", currentHighlights);
   return (
     <div className="flex min-h-screen p-4">
