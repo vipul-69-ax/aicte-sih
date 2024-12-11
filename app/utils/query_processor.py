@@ -59,3 +59,4 @@ def generate_response(query, previous_messages=[]):
     )
 
     return response.choices[0].message.content
+
