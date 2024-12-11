@@ -128,19 +128,18 @@ model UniversityApplication {
 }
 
 model UniversityDocuments {
-  uni_doc_id                String                      @id @default(uuid())
-  uni_application_id        String
-  doc_id                    String
-  errors                    Json?
-  extractedTexts            Json?
-  uni_doc_uri               String?
-  timestamp                 DateTime                    @default(now())
-  messages                  Json?
-  status                    DocumentStatus              @default(NOT_SUBMITTED)
-  application               UniversityApplication       @relation(fields: [uni_application_id], references: [uni_application_id], onDelete: Cascade)
-  document                  Document                    @relation(fields: [doc_id], references: [doc_id])
-  evaluator_id              String?
-  EvaluatorDocumentRelation EvaluatorDocumentRelation[]
+  uni_doc_id         String                      @id @default(uuid())
+  uni_application_id String
+  doc_id             String
+  errors             Json?
+  extractedTexts     Json?
+  uni_doc_uri        String?
+  timestamp          DateTime                    @default(now())
+  messages           Json?
+  status             DocumentStatus              @default(NOT_SUBMITTED)
+  application        UniversityApplication       @relation(fields: [uni_application_id], references: [uni_application_id], onDelete: Cascade)
+  document           Document                    @relation(fields: [doc_id], references: [doc_id])
+  assigned_evaluator EvaluatorDocumentRelation[]
 }
 
 model EvaluatorDocumentRelation {

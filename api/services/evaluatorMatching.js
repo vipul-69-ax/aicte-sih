@@ -13,10 +13,10 @@ async function refetch() {
         allEvaluators[layer_index] = data.sort((a, b) => a.assigned_document.length - b.assigned_document.length);
         layer_index++;
     };
-    const data = await prisma.universityDocuments.findMany({ where: { status: "SUBMITTED" }, include: { document: true } });
+    const data = await prisma.universityDocuments.findMany({ where: { status: "SUBMITTED", }, include: { document: true, assigned_evaluator: true } });
     console.log("Started Evaluator Matcher.", data);
     unverifiedDocuments = data.sort((doc_a, doc_b) => doc_a.document.deadline.getTime() - doc_b.document.deadline.getTime());
-    allUnverifiedDocuments = [unverifiedDocuments, unverifiedDocuments, unverifiedDocuments]
+    allUnverifiedDocuments = [new Array(...unverifiedDocuments), new Array(...unverifiedDocuments), new Array(...unverifiedDocuments)]
     return setTimeout(() => { console.log("All data fetched.") }, 1000);
 };
 refetch().then(() => {
@@ -46,9 +46,9 @@ async function assignDocumentToEvaluator(allEvaluator = allEvaluators) {
                     allUnverifiedDocuments[layer_index].splice(index, 1);
                 }
             };
-            await pushAssignedToDB(assigned);
-            await refetch();
         }
+        await refetch();
+        await pushAssignedToDB(assigned);
         layer_index++;
     }
     return assigned;
@@ -59,6 +59,7 @@ async function pushAssignedToDB(assigned) {
     try {
         await prisma.$transaction(async (prisma) => {
             for (const assignment of assigned) {
+                await prisma.universityDocuments.update({ where: { uni_doc_id: assignment.uni_doc_id }, data: { status: "ASSIGNED" } });
                 await prisma.evaluatorDocumentRelation.create({ data: { evaluator_id: assignment.evaluator_id, uni_doc_id: assignment.uni_doc_id, check_type: assignment.check_type, status: "ASSIGNED" } })
             }
         });
