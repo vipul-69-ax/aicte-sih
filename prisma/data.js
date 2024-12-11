@@ -8,6 +8,7 @@ const evaluatorRegisterForSeeder = async (data) => {
     }
     const hashedPassword = await argon2.hash(data.password);
     data.password = hashedPassword;
+    console.log("seeder", data);
     try {
         const dbEvaluatorRes = await prisma.evaluator.create({ data: data });
     }

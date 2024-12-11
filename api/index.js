@@ -18,12 +18,15 @@ app.post("/otp", sendOtpEmail);
 app.get("/", (req, res) => { res.send("hiii") });
 
 async function cleanup() {
-  await actionLogger.pushToDB().then(() => { console.log("Logged Pushed to the DB.") });
-  await prisma.$disconnect().then(() => { console.log("Closed Database Connection.") });
-  process.exit(0);
+  console.log(actionLogger.allLogs);
+  await actionLogger.pushToDB()
+  console.log("Logged Pushed to the DB.")
+  await prisma.$disconnect()
+  console.log("Closed Database Connection.")
+  setTimeout(process.exit(0), 5000);
 }
-process.on("SIGINT", cleanup);
-process.on("SIGTERM", cleanup);
+process.on("SIGINT", async () => await cleanup());
+process.on("SIGTERM", async () => await cleanup());
 const PORT = process.env.PORT || 3100
 app.listen(PORT, () => {
   console.log(`Express server running on port ${PORT}`)

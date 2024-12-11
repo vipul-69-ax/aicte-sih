@@ -5,8 +5,20 @@ const prisma = require("../../../utils/db");
 
 const allowedStatusActions = ['IN_REVIEW', 'APPROVED', 'REJECTED'];
 
+const getEvaluatorData = async (req, res) => {
+    const authData = req.authData;
+    if (!authData.role.includes("evaluator")) {
+        res.status(401).json({ errors: "Not authorized as Evaluator." })
+    }
+    try {
+        const evaluator = await prisma.evaluator.findUnique({ where: { evaluator_id: authData.evaluator_id }, include: { assigned_document: true } });
+    }
+    catch (err) {
+        console.log(err);
+    }
+}
+
 const getAssignedDocuments = async (req, res) => {
-    console.log(req);
     const authData = req.authData;
     if (!authData.role.includes("evaluator")) {
         res.status(401).json({ errors: "Not authorized as Evaluator." })
@@ -38,6 +50,7 @@ const getAssignedDocumentById = async (req, res) => {
         return res.status(400).json({ errors: "Document not found." });
     }
 }
+
 
 const actionOnAssignedDocuments = async (req, res) => {
     const { uni_doc_id, messages, status } = req.body;

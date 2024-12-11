@@ -64,7 +64,7 @@ async function institute_register(req, res) {
       });
       return universityDetails.id;
     })
-    const token = jwt.verify({ institute_id: transactionResult }, JWT_SECRET);
+    const token = jwt.sign({ institute_id: transactionResult }, JWT_SECRET);
     return res.status(201).json({
       success: true,
       message: "Institute registered successfully",

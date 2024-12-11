@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "UniversityApplication" ADD COLUMN     "createdOn" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

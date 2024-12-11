@@ -10,6 +10,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum EvaluatorRole {
+  FORGERY_CHECKER
+  LAYOUT_CHECKER
+  CONTENT_CHECKER
+}
+
 enum Doer {
   EVALUATOR
   UNIVERSITY
@@ -92,17 +98,17 @@ model University {
 }
 
 model Evaluator {
-  evaluator_id         String                  @id @default(uuid())
-  email                String                  @unique
-  phone                String                  @unique
+  evaluator_id         String                      @id @default(uuid())
+  email                String                      @unique
+  phone                String                      @unique
   password             String
   state                String
   district             String
   pincode              String
-  role                 String
+  role                 EvaluatorRole
   specialization       String[]
   assigned_application UniversityApplication[]
-  assigned_document    UniversityDocuments[]
+  assigned_document    EvaluatorDocumentRelation[]
 }
 
 model UniversityApplication {
@@ -122,19 +128,29 @@ model UniversityApplication {
 }
 
 model UniversityDocuments {
-  uni_doc_id         String                @id @default(uuid())
-  uni_application_id String
-  doc_id             String
-  errors             Json?
-  extractedTexts     Json?
-  uni_doc_uri        String?
-  timestamp          DateTime              @default(now())
-  messages           Json?
-  status             DocumentStatus        @default(NOT_SUBMITTED)
-  application        UniversityApplication @relation(fields: [uni_application_id], references: [uni_application_id], onDelete: Cascade)
-  document           Document              @relation(fields: [doc_id], references: [doc_id])
-  Evaluator          Evaluator?            @relation(fields: [evaluator_id], references: [evaluator_id])
-  evaluator_id       String?
+  uni_doc_id                String                      @id @default(uuid())
+  uni_application_id        String
+  doc_id                    String
+  errors                    Json?
+  extractedTexts            Json?
+  uni_doc_uri               String?
+  timestamp                 DateTime                    @default(now())
+  messages                  Json?
+  status                    DocumentStatus              @default(NOT_SUBMITTED)
+  application               UniversityApplication       @relation(fields: [uni_application_id], references: [uni_application_id], onDelete: Cascade)
+  document                  Document                    @relation(fields: [doc_id], references: [doc_id])
+  evaluator_id              String?
+  EvaluatorDocumentRelation EvaluatorDocumentRelation[]
+}
+
+model EvaluatorDocumentRelation {
+  id           String              @id @default(uuid())
+  evaluator_id String
+  uni_doc_id   String
+  status       DocumentStatus      @default(ASSIGNED)
+  check_type   EvaluatorRole
+  evaluator    Evaluator           @relation(fields: [evaluator_id], references: [evaluator_id])
+  document     UniversityDocuments @relation(fields: [uni_doc_id], references: [uni_doc_id])
 }
 
 model ApplicationTypes {
@@ -151,7 +167,7 @@ model Document {
   doc_id              String                 @id @default(uuid())
   doc_name            String
   format_uri          String?
-  deadline            DateTime?
+  deadline            DateTime               @default(now())
   priority            Priority               @default(MEDIUM)
   application_type    ApplicationDocuments[]
   UniversityDocuments UniversityDocuments[]

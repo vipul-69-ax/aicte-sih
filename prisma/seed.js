@@ -10,8 +10,8 @@ const evaluatorData = [
         state: "Maharashtra",
         district: "Mumbai",
         pincode: "400001",
-        role: "Senior Evaluator",
-        specialization: ["new_institute_0", "new_institute_1", "eoa_1", "eoa_3"]  // Evaluates new institution application documents and accreditation proof
+        role: "FORGERY_CHECKER", // Updated role from enum
+        specialization: ["new_institute_0", "new_institute_1", "eoa_1", "eoa_3"]
     },
     {
         evaluator_id: "f9b240d4-2121-4c69-9357-5089d7cb3a19",
@@ -21,8 +21,8 @@ const evaluatorData = [
         state: "Karnataka",
         district: "Bangalore",
         pincode: "560001",
-        role: "Junior Evaluator",
-        specialization: ["collaboration_0", "collaboration_1", "collaboration_2"]  // Specializes in collaboration & twinning programs
+        role: "LAYOUT_CHECKER", // Updated role from enum
+        specialization: ["collaboration_0", "collaboration_1", "collaboration_2"]
     },
     {
         evaluator_id: "cbf66062-e8fc-4e5b-b467-b6f3ed3b3a2f",
@@ -32,8 +32,8 @@ const evaluatorData = [
         state: "Delhi",
         district: "New Delhi",
         pincode: "110001",
-        role: "Evaluator",
-        specialization: ["odl_ol_0", "odl_ol_1", "odl_ol_2"]  // Specializes in Open and Distance Learning (ODL) and Online Learning (OL)
+        role: "CONTENT_CHECKER", // Updated role from enum
+        specialization: ["odl_ol_0", "odl_ol_1", "odl_ol_2"]
     },
     {
         evaluator_id: "aee9ec07-2f9e-4b9d-a0b3-0a79941a0b56",
@@ -43,8 +43,8 @@ const evaluatorData = [
         state: "Tamil Nadu",
         district: "Chennai",
         pincode: "600001",
-        role: "Lead Evaluator",
-        specialization: ["penal_actions_0", "penal_actions_1"]  // Focuses on penal actions for norm violations
+        role: "FORGERY_CHECKER", // Updated role from enum
+        specialization: ["penal_actions_0", "penal_actions_1"]
     },
     {
         evaluator_id: "d98b5bba-6ea0-4b2f-b0b5-0db37c6c5b92",
@@ -54,15 +54,51 @@ const evaluatorData = [
         state: "Gujarat",
         district: "Ahmedabad",
         pincode: "380001",
-        role: "Senior Evaluator",
-        specialization: ["hibernation_0", "hibernation_2"]  // Specializes in hibernation or closure of institutions
+        role: "LAYOUT_CHECKER", // Updated role from enum
+        specialization: ["hibernation_0", "hibernation_2"]
+    },
+    {
+        evaluator_id: "e93c4f9b-3456-4e87-bc68-c9d6adf12345",
+        email: "clarkkent@example.com",
+        phone: "9876654321",
+        password: "ItsCu@123",
+        state: "Punjab",
+        district: "Ludhiana",
+        pincode: "141001",
+        role: "CONTENT_CHECKER", // Updated role from enum
+        specialization: ["odl_ol_0", "odl_ol_1", "odl_ol_2"]
+    },
+    {
+        evaluator_id: "f21d8abc-9abc-4e7d-a12f-bd34cd12e678",
+        email: "tonystark@example.com",
+        phone: "9001234567",
+        password: "ItsCu@123",
+        state: "Haryana",
+        district: "Gurgaon",
+        pincode: "122001",
+        role: "LAYOUT_CHECKER", // Updated role from enum
+        specialization: ["collaboration_0", "collaboration_1", "collaboration_2"]
+    },
+    {
+        evaluator_id: "g87a6f5d-8d6e-4f7d-bc9e-bf12cd345678",
+        email: "dianaprince@example.com",
+        phone: "9551234567",
+        password: "ItsCu@123",
+        state: "West Bengal",
+        district: "Kolkata",
+        pincode: "700001",
+        role: "FORGERY_CHECKER", // Updated role from enum
+        specialization: ["new_institute_0", "new_institute_1", "eoa_1", "eoa_3"]
     }
 ];
 
 async function seed() {
+    await prisma.evaluatorDocumentRelation.deleteMany({});
     await prisma.universityApplication.deleteMany({});
     await prisma.universityDocuments.deleteMany({});
     await prisma.applicationDocuments.deleteMany({});
+    await prisma.contactDetails.deleteMany({});
+    await prisma.university.deleteMany({});
     await prisma.document.deleteMany({});
     await prisma.applicationTypes.deleteMany({});
     await prisma.evaluator.deleteMany({});
@@ -86,6 +122,7 @@ async function seed() {
                     doc_id: doc.doc_id,
                     doc_name: doc.doc_name,
                     format_uri: doc.format_uri,
+                    deadline: new Date('2025-01-01T00:00:00Z')
                 },
             });
 

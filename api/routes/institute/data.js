@@ -7,8 +7,8 @@ InstitueData.post("/new_application", start_new_application)
 InstitueData.get("/get_applications", get_applications)
 InstitueData.get("/get_documents", get_application_document_by_id)
 InstitueData.post("/document_analysis", document_analysis)
-InstitueData.post("/validate_image", validate_university_image)
-InstitueData.post("/validate_blueprint", validate_blueprint)
+// InstitueData.post("/validate_image", validate_university_image)
+// InstitueData.post("/validate_blueprint", validate_blueprint)
 
 
 module.exports = { InstitueData }
