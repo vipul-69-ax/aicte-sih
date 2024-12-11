@@ -166,12 +166,12 @@ const getUniversityDocumentBy_doc_id = async (req, res) => {
     }
 }
 
-const docUpload = async (uni_application_id, doc_id, uni_doc_uri) => {
+const docUpload = async (uni_application_id, doc_id, uni_doc_uri, response) => {
     try {
         const document = await prisma.$transaction(async (prisma) => {
             await prisma.universityDocuments.updateMany({ where: { uni_application_id: uni_application_id, doc_id: doc_id }, data: { status: "REJECTED" } });
 
-            return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, status: "SUBMITTED" }, include: { document: true } });
+            return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: response?.data.layout_issues, extractedTexts: response?.data?.placeholder_values, status: "SUBMITTED" }, include: { document: true, application: true } });
         })
         await actionLogger.log(new Log(new Date(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
         return document;
@@ -184,50 +184,51 @@ const docUpload = async (uni_application_id, doc_id, uni_doc_uri) => {
 const FASTAPIURL = "http://localhost:8000";
 const document_analysis = async (req, res) => {
     const { uni_application_id, doc_id, uni_doc_uri } = req.body;
-    // let response;
-    // try {
-    //     response = await axios.post(`${FASTAPIURL}/chat/comparison`, {
-    //         template_url: req.body.formatId,
-    //         filled_url: req.body.uni_doc_uri
-    //     });
-    //     const layoutIssues = response.data.layout_issues || [];
-    //     layoutErrors = [];
-    //     layoutIssues.forEach((issue, idx) => {
-    //         layoutErrors.push({
-    //             content: {
-    //                 text: issue.description,
-    //             },
-    //             position: {
-    //                 boundingRect: {
-    //                     x1: issue.location?.[0] || 0,
-    //                     y1: issue.location?.[1] || 0,
-    //                     x2: issue.location?.[2] || 0,
-    //                     y2: issue.location?.[3] || 0,
-    //                     width: (issue.location?.[2] || 0) - (issue.location?.[0] || 0),
-    //                     height: (issue.location?.[3] || 0) - (issue.location?.[1] || 0),
-    //                     pageNumber: issue.page || 1,
-    //                 },
-    //                 rects: [],
-    //                 pageNumber: issue.page || 1,
-    //             },
-    //             comment: issue.description,
-    //             id: `error-${idx + 1}`,
-    //         });
-    //     });
-    //     response.data.layout_issues = layoutErrors;
-    // Sending the response back to the client with the data
+    let response;
     try {
-        const document = await docUpload(uni_application_id, doc_id, uni_doc_uri);
+        response = await axios.post(`${FASTAPIURL}/chat/comparison`, {
+            template_url: req.body.formatId,
+            filled_url: req.body.uni_doc_uri
+        });
+        const layoutIssues = response.data.layout_issues || [];
+        layoutErrors = [];
+        layoutIssues.forEach((issue, idx) => {
+            layoutErrors.push({
+                content: {
+                    text: issue.description,
+                },
+                position: {
+                    boundingRect: {
+                        x1: issue.location?.[0] || 0,
+                        y1: issue.location?.[1] || 0,
+                        x2: issue.location?.[2] || 0,
+                        y2: issue.location?.[3] || 0,
+                        width: (issue.location?.[2] || 0) - (issue.location?.[0] || 0),
+                        height: (issue.location?.[3] || 0) - (issue.location?.[1] || 0),
+                        pageNumber: issue.page || 1,
+                    },
+                    rects: [],
+                    pageNumber: issue.page || 1,
+                },
+                comment: issue.description,
+                id: `error-${idx + 1}`,
+            });
+        });
+        response.data.layout_issues = layoutErrors;
+        // Sending the response back to the client with the data
+        const document = await docUpload(uni_application_id, doc_id, uni_doc_uri, response);
+        response.data["currentUniDoc"] = document;
+        console.log(response.data);
         res.status(200).json({
             success: true,
-            data: document,
+            data: response.data,
         });
     } catch (error) {
         console.error("Error in document_analysis:", error.message);
         // Responding with an appropriate error message and status code
-        res.status(500).json({
+        res.status(error.response?.status || 500).json({
             success: false,
-            message: "An error occurred while processing the request.",
+            message: error.response?.data?.detail || "An error occurred while processing the request.",
         });
     }
     finally {
