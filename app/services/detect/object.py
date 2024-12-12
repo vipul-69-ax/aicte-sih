@@ -7,7 +7,7 @@ import requests
 
 
 try:
-    model = YOLO('/home/hp/Desktop/models/app/data/best.pt')  # Load pretrained model
+    model = YOLO('D:/Programming/project/sih/git/aicte_models/app/data/best.pt')  # Load pretrained model
     model.to('cuda' if torch.cuda.is_available() else 'cpu')  # Move to GPU if available
 except Exception as e:
     print(f"Error loading model: {str(e)}")
