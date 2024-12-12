@@ -46,7 +46,7 @@ const evaluatorLogin = async (req, res) => {
       throw new Error("Not authorized");
     }
     const token = jwt.sign({ evaluator_id: evaluator.evaluator_id, role: evaluator.role }, JWT_SECRET);
-    return res.status(200).json(token);
+    return res.status(200).json({ token: token });
   }
   catch (err) {
     console.log(err);

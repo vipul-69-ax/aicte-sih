@@ -139,7 +139,7 @@ const get_application_document_by_id = async (req, res) => {
         //     const values = [institute_id, application_id];
 
         //     const result = await db.query(query, values);
-        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id }, include: { application: { include: { documents: { include: { documentR: true } } } }, UniversityDocuments: { include: { document: true } } } });
+        const documents = await prisma.universityApplication.findUnique({ where: { uni_application_id: application_id, universityId: institute_id }, include: { application: { include: { documents: { include: { documentR: true } } } }, UniversityDocuments: { include: { document: true, assigned_evaluator: true } } } });
 
         if (!documents) {
             return res.status(404).json({ error: "No application found with the given Application ID for the given instituteID." });
@@ -171,7 +171,7 @@ const docUpload = async (uni_application_id, doc_id, uni_doc_uri, response) => {
         const document = await prisma.$transaction(async (prisma) => {
             await prisma.universityDocuments.updateMany({ where: { uni_application_id: uni_application_id, doc_id: doc_id }, data: { status: "REJECTED" } });
 
-            return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: response?.data.layout_issues, extractedTexts: response?.data?.placeholder_values, status: "SUBMITTED" }, include: { document: true, application: true } });
+            return await prisma.universityDocuments.create({ data: { uni_application_id: uni_application_id, doc_id: doc_id, uni_doc_uri: uni_doc_uri, errors: response?.data.layout_issues, extractedTexts: response?.data?.placeholder_values, status: "SUBMITTED" }, include: { document: true, application: true, assigned_evaluator: true } });
         })
         await actionLogger.log(new Log(new Date(), uni_application_id, document.uni_doc_id, undefined, LogAction.DOC_SUBMITTED, Doer.UNIVERSITY, LogObject.DOCUMENT));
         return document;

@@ -7,11 +7,10 @@ const allowedStatusActions = ['IN_REVIEW', 'APPROVED', 'REJECTED'];
 
 const getEvaluatorData = async (req, res) => {
     const authData = req.authData;
-    if (!authData.role.includes("evaluator")) {
-        res.status(401).json({ errors: "Not authorized as Evaluator." })
-    }
     try {
-        const evaluator = await prisma.evaluator.findUnique({ where: { evaluator_id: authData.evaluator_id }, include: { assigned_document: true } });
+        const evaluator = await prisma.evaluator.findUnique({ where: { evaluator_id: authData.evaluator_id }, include: { assigned_document: { include: { document: { include: { application: { include: { university: true } } } } } } } });
+        console.log(evaluator);
+        res.json({ evaluator });
     }
     catch (err) {
         console.log(err);
@@ -83,4 +82,4 @@ const actionOnAssignedApplications = async (req, res) => {
     //TODO if time left then implement
 }
 
-module.exports = { actionOnAssignedApplications, actionOnAssignedDocuments, getAssignedDocuments }
+module.exports = { actionOnAssignedApplications, actionOnAssignedDocuments, getAssignedDocuments, getEvaluatorData }
