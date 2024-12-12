@@ -1,153 +1,147 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { UserCheck, Mail, Lock, ClipboardCheck, Award, Scale, BookOpen } from 'lucide-react'
-import AicteLogo from '@/assets/aicte-logo.webp'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { AlertCircle, Mail, Lock, CheckCircle2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import Img from '@/assets/aicte-logo.webp'
+import { api } from '@/lib/utils'
+import { SERVER_URL } from '@/constants/API'
+import { useAuthStore } from '@/hooks/useAuth'
+export function EvaluatorLogin() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const router = useNavigate()
+  const {setToken,setMode} = useAuthStore()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
 
-export default function EvaluatorAuth() {
-  const [activeTab, setActiveTab] = useState('register')
+    if (!email || !password) {
+      setError('Please fill in all fields')
+      return
+    }
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
-      transition: { 
-        type: "spring", 
-        stiffness: 100, 
-        damping: 15 
-      } 
+    // Here you would typically make an API call to verify the credentials
+    // For this example, we'll just simulate a successful login
+    try {
+      // Simulating an API call
+      const token = await api.post(`${SERVER_URL}/evaluator/login`,{
+        authKey:email,
+        password:password
+      })
+      if(token.data){
+      setToken(token.data.token)
+      setMode("evaluator")
+      
+      // If login is successful, redirect to the dashboard
+      router('/evaluator/dashboard')
+      }
+    } catch (err) {
+      setError('Invalid email or password')
     }
   }
 
-  const benefits = [
-    { icon: ClipboardCheck, title: "Streamlined Evaluation", description: "Efficiently assess institution applications" },
-    { icon: Award, title: "Contribute to Excellence", description: "Help maintain high educational standards" },
-    { icon: Scale, title: "Fair Assessment", description: "Ensure equitable evaluation processes" },
-    { icon: BookOpen, title: "Continuous Learning", description: "Stay updated with latest educational trends" },
-  ]
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <motion.div
-          className="text-center mb-8"
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-        >
-          <img src={AicteLogo} alt="AICTE Logo" className="h-24 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-navy-600 mb-2">AICTE Evaluator Portal</h1>
-          <p className="text-xl text-gray-600">Empowering Excellence through Expert Evaluation</p>
-        </motion.div>
-
-        <div className="flex flex-wrap -mx-4">
-          <motion.div
-            className="w-full lg:w-1/3 px-4 mb-8 lg:mb-0"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <div className="bg-white border-2 border-navy-100 rounded-lg p-6 shadow-md">
-              <h2 className="text-2xl font-semibold mb-6 text-navy-600 border-b-2 border-gold-300 pb-2">Evaluator Benefits</h2>
-              <div className="space-y-6">
-                {benefits.map((benefit, index) => (
-                  <motion.div key={index} className="flex items-start space-x-4" variants={itemVariants}>
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gold-100 flex items-center justify-center">
-                      <benefit.icon className="w-6 h-6 text-navy-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-navy-600">{benefit.title}</h3>
-                      <p className="text-gray-600">{benefit.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="max-w-4xl w-full space-y-8 p-10 bg-white rounded-xl shadow-2xl">
+        <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="w-full md:w-1/2 pr-8">
+            <img
+              src={Img}
+              alt="AICTE Logo"
+              className="mx-auto mb-8"
+            />
+            <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-4">
+              AICTE Evaluator Portal
+            </h2>
+            <p className="text-md text-gray-600 text-center mb-6">
+              Access the evaluation system for AICTE accreditation
+            </p>
+            <div className="space-y-4 text-sm">
+              <div className="flex items-center">
+                <CheckCircle2 className="h-5 w-5 mr-2 text-blue-500" />
+                <span>Evaluate technical institutions across India</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle2 className="h-5 w-5 mr-2 text-blue-500" />
+                <span>Access comprehensive evaluation tools</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle2 className="h-5 w-5 mr-2 text-blue-500" />
+                <span>Contribute to maintaining education standards</span>
               </div>
             </div>
-          </motion.div>
-          
-          <motion.div
-            className="w-full lg:w-2/3 px-4"
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-          >
-            <div className="bg-white border-2 border-navy-100 rounded-lg p-8 shadow-md">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-8">
-                  <TabsTrigger value="register" className="text-lg">Register</TabsTrigger>
-                  <TabsTrigger value="login" className="text-lg">Login</TabsTrigger>
-                </TabsList>
-                <TabsContent value="register">
-                  <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-                    <motion.div variants={itemVariants}>
-                      <Label htmlFor="name" className="text-navy-600">Full Name</Label>
-                      <div className="flex mt-1">
-                        <UserCheck className="w-5 h-5 mr-2 text-navy-400" />
-                        <Input id="name" placeholder="Enter your full name" required className="flex-grow" />
-                      </div>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <Label htmlFor="email" className="text-navy-600">Email Address</Label>
-                      <div className="flex mt-1">
-                        <Mail className="w-5 h-5 mr-2 text-navy-400" />
-                        <Input id="email" type="email" placeholder="your.email@example.com" required className="flex-grow" />
-                      </div>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <Label htmlFor="password" className="text-navy-600">Create Password</Label>
-                      <div className="flex mt-1">
-                        <Lock className="w-5 h-5 mr-2 text-navy-400" />
-                        <Input id="password" type="password" placeholder="Create a secure password" required className="flex-grow" />
-                      </div>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <Button type="submit" className="w-full bg-black hover:bg-navy-700 text-white">Register as Evaluator</Button>
-                    </motion.div>
-                  </form>
-                </TabsContent>
-                <TabsContent value="login">
-                  <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-                    <motion.div variants={itemVariants}>
-                      <Label htmlFor="login-email" className="text-navy-600">Email Address</Label>
-                      <div className="flex mt-1">
-                        <Mail className="w-5 h-5 mr-2 text-navy-400" />
-                        <Input id="login-email" type="email" placeholder="your.email@example.com" required className="flex-grow" />
-                      </div>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <Label htmlFor="login-password" className="text-navy-600">Password</Label>
-                      <div className="flex mt-1">
-                        <Lock className="w-5 h-5 mr-2 text-navy-400" />
-                        <Input id="login-password" type="password" placeholder="Enter your password" required className="flex-grow" />
-                      </div>
-                    </motion.div>
-                    <motion.div variants={itemVariants}>
-                      <Button type="submit" className="w-full bg-black hover:bg-navy-700 text-white">Access Evaluator Portal</Button>
-                    </motion.div>
-                  </form>
-                </TabsContent>
-              </Tabs>
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">AICTE Mission</h3>
+              <p className="text-sm text-blue-700">
+                To promote quality in technical education system and provide state-of-the-art infrastructure to technical institutions.
+              </p>
             </div>
-          </motion.div>
+          </div>
+          <div className="w-full md:w-1/2 mt-8 md:mt-0">
+            <Card className="w-full">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-center">Evaluator Sign In</CardTitle>
+              </CardHeader>
+              <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
+                    <div className="relative">
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="evaluator@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="pl-10"
+                      />
+                      <Mail className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="pl-10"
+                      />
+                      <Lock className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                  </div>
+                  {error && (
+                    <div className="text-red-500 text-sm flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-2" />
+                      {error}
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">Sign In</Button>
+                </CardFooter>
+              </form>
+              <div className="text-center mt-4 text-sm">
+                <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
+              </div>
+            </Card>
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Important Notice</h3>
+              <p className="text-sm text-gray-700">
+                Ensure you have your AICTE Evaluator ID ready. For any technical issues, please contact the AICTE support team.
+              </p>
+            </div>
+          </div>
         </div>
-
-        <motion.div 
-          className="mt-8 text-center text-sm text-gray-600"
-          variants={containerVariants}
-        >
-          For technical support, contact AICTE helpdesk: <a href="mailto:helpdesk1@aicte-india.org" className="text-navy-600 hover:underline">helpdesk1@aicte-india.org</a>
-        </motion.div>
       </div>
     </div>
   )

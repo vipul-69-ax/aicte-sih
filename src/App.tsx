@@ -19,6 +19,7 @@ import ErrorFix from "./pages/institute/applications/ErrorFixPage";
 import Infrastructure from "./pages/institute/dashboard/infrastructure";
 import AdminDashboard from "./pages/admin";
 import Evaluator from "./pages/evaluator";
+import { EvaluatorLogin } from "./pages/evaluator/auth";
 
 export const queryClient = new QueryClient();
 
@@ -86,7 +87,9 @@ export default function App() {
         <Route path="/admin" element={<AdminDashboard/>}>
 
         </Route>
-        <Route path="/evaluator" element={<Evaluator/>}/>
+        <Route path="/evaluator" element={<EvaluatorLogin/>}/>
+        <Route path="/evaluator/dashboard" element={<Evaluator/>}/>
+
         {/* Catch-all route */}
         <Route
           path="*"

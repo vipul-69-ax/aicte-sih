@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -51,6 +51,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
+import { SERVER_URL } from "@/constants/API";
+import { api } from "@/lib/utils";
 
 export default function NOCApprovalDashboard() {
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -66,7 +68,14 @@ export default function NOCApprovalDashboard() {
   const [showUniversityDialog, setShowUniversityDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showEvaluatorInfo, setShowEvaluatorInfo] = useState(false);
-
+  const [dashboardData, setDashboardData] = useState()
+  useEffect(()=>{
+    const getReq =async()=>{
+      const resp = await api.get(`${SERVER_URL}/evaluator/data`)
+      setDashboardData(resp.data)
+    }
+    getReq()
+  },[])
   // Mock data - replace with actual data in a real application
   const user = {
     name: "Vipul Sharma",
@@ -140,6 +149,14 @@ export default function NOCApprovalDashboard() {
     },
   ];
 
+  const actionOnDoc=async()=>{
+    const resp = await api.post(`${SERVER_URL}/evaluator/action_on_doc`,{
+      //
+    })
+    if(resp.status === 200){
+      alert("Done")
+    }
+  }
   const [msg, setMsg] = useState<string>()
 
   const handleVerification = () => {
@@ -200,7 +217,7 @@ export default function NOCApprovalDashboard() {
         value: Math.round(document.approvalPercentage * 0.3),
       },
     ];
-
+    if(!dashboardData) return <>Fetching Data...</>
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
