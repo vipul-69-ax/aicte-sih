@@ -24,6 +24,7 @@ const getAssignedDocuments = async (req, res) => {
     }
     try {
         let assignedDocuments = await prisma.universityDocuments.findMany({ where: { evaluator_id: authData.evaluator_id } });
+        console.log("assignedDocument", assignedDocuments);
         if (assignedDocuments.length == 0) {
             await assignDocumentToEvaluator([authData.evaluator_id]);
         }
@@ -71,7 +72,7 @@ const actionOnAssignedDocuments = async (req, res) => {
     try {
         const response = await prisma.$transaction(async (prisma) => {
             updateDoc = await prisma.evaluatorDocumentRelation.updateMany({ where: { evaluator_id: evaluator_id, uni_doc_id: uni_doc_id }, data: { status: status } });
-            return await prisma.universityDocuments.update({ where: { uni_doc_id }, data: { messages: messages } });
+            return await prisma.universityDocuments.update({ where: { uni_doc_id }, data: { messages: [{ message: { id: Math.random().toString(36), content: messages, timestamp: new Date().toString() } }] } });
         })
         actionLogger.log(new Log(new Date(), undefined, uni_doc_id, evaluator_id, status, Doer.EVALUATOR, LogObject.DOCUMENT));
         return res.status(200).json({ data: updateDoc, message: "Document Updated Successfully." })
