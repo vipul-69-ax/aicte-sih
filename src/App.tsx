@@ -20,6 +20,8 @@ import Infrastructure from "./pages/institute/dashboard/infrastructure";
 import AdminDashboard from "./pages/admin";
 import Evaluator from "./pages/evaluator";
 import { EvaluatorLogin } from "./pages/evaluator/auth";
+import Apaar from "./Apaar";
+import ApaarDashboard from "./ApaarDashboard";
 
 export const queryClient = new QueryClient();
 
@@ -87,6 +89,9 @@ export default function App() {
         <Route path="/admin" element={<AdminDashboard/>}>
 
         </Route>
+        <Route path="/apaar" element={<Apaar/>}/>
+        <Route path="/apaar-dash" element={<ApaarDashboard/>}/>
+
         <Route path="/evaluator" element={<EvaluatorLogin/>}/>
         <Route path="/evaluator/dashboard" element={<Evaluator/>}/>
 

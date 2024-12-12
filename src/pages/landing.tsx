@@ -48,7 +48,7 @@ export default function AICTEPortal() {
         <Link className="flex items-center mb-4 sm:mb-0" href="#" aria-label="AICTE Home">
           <img
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-09-25%20at%207.22.28%E2%80%AFPM-0Ir4wvA8bwC3c08CyM4NVgTIa5Ky8V.png"
-            className="mr-4 h-36 w-36"
+            className="mr-4 h-18 w-24"
           />
           <div className="flex flex-col">
             <span className="font-bold text-sm sm:text-base md:text-lg">All India Council for Technical Education</span>
@@ -101,6 +101,7 @@ export default function AICTEPortal() {
               <div className="space-x-4">
                 <Button>Learn More</Button>
                 <Button variant="outline">Explore Programs</Button>
+                <Button onClick={()=>navigate("/apaar")} variant="outline">Apaar</Button>
               </div>
               <div className="mt-8 w-full max-w-3xl">
                 <img

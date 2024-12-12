@@ -206,7 +206,10 @@ export default function UploadLegalDocument() {
                 </Button>
               )}
               {file && isVerifying && (
-                <div>Your File is being checked by our Smart AI</div>
+                <div className="flex justify-center items-center p-4 border border-gray-200 rounded bg-gray-100">
+                <div className="animate-spin h-8 w-8 border-t-4 border-b-4 border-r-4 border-gray-400 rounded-full"></div>
+                <span className="ml-2">Checking your file...</span>
+              </div>
               )}
             </div>
           </CardFooter>

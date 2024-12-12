@@ -88,13 +88,6 @@ export const PdfHighlight: React.FC<HighlightProps> = ({
               <>
                 <div className="flex justify-between items-center">
                   <h4 className="font-medium leading-none">{text}</h4>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit
-                  </Button>
                 </div>
                 <p className="text-sm text-muted-foreground">{comment}</p>
               </>

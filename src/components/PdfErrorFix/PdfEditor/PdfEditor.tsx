@@ -176,6 +176,7 @@ interface Message {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplicationDocument } from "@/schemas/applicationSchema";
+import { timeStamp } from "console";
 
 interface Message {
   id: number;
@@ -210,7 +211,7 @@ function EvaluatorMessages({ messages, assigned_evaluator }) {
                   <div className="self-center">No Updates from Evaluator</div>
                 </div>
               ) : (
-                messages.map((message) => (
+                [{id:1, timestamp:new Date().toString(), content:"Seems forged"}].map((message) => (
                   <div
                     key={message.id}
                     className="mb-4 last:mb-0 p-3 bg-muted rounded-lg"

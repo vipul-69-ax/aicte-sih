@@ -25,7 +25,7 @@ export default function ErrorChatbot({pdfUrl}:ErrorChatbotProps) {
   }
 
   return (
-    <div className="container w-full mx-auto p-4 flex justify-center items-center min-h-screen">
+    <div className="container w-auto mx-auto p-4 flex justify-center items-center min-h-screen">
       <Card className="w-full shadow-lg">
         <CardHeader className="border-b">
           <CardTitle className="text-lg font-medium">
