@@ -42,7 +42,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import {
@@ -53,6 +52,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SERVER_URL } from "@/constants/API";
 import { api } from "@/lib/utils";
+import { Legend } from "recharts";
 
 export default function NOCApprovalDashboard() {
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -89,10 +89,15 @@ export default function NOCApprovalDashboard() {
     },
   };
   dashboardData?.assigned_document.forEach((doc) => {
+    console.log("assignment", doc);
     if (doc.status == "ASSIGNED") approvalProgress.assigned.count++;
     if (doc.status == "REJECTED") approvalProgress.rejected.count++;
     if (doc.status == "APPROVED") approvalProgress.approved.count++;
   });
+  const approved = dashboardData?.assigned_document.filter(
+    (doc) => doc.status == "ASSIGNED"
+  );
+  console.log("assigned", approved);
   const user = {
     name: dashboardData?.email.split("@")[0] ?? "Vipul Sharma",
     position: dashboardData?.role ?? "NOC Approval Evaluator",
@@ -102,14 +107,14 @@ export default function NOCApprovalDashboard() {
   };
 
   const currentDocument = {
-    id: dashboardData?.assigned_document[0].uni_doc_id ?? "DOC5678",
-    status: dashboardData?.assigned_document[0].status ?? "In Progress",
+    id: dashboardData?.assigned_document[0]?.uni_doc_id ?? "DOC5678",
+    status: dashboardData?.assigned_document[0]?.status ?? "In Progress",
     university:
-      dashboardData?.assigned_document[0].document.application.university
+      dashboardData?.assigned_document[0]?.document.application.university
         .universityName ?? "Future Bright Academy",
     submissionDate:
       new Date(
-        dashboardData?.assigned_document[0].document.timestamp
+        dashboardData?.assigned_document[0]?.document.timestamp
       ).toDateString() ?? "2024-11-26",
     type: "NOC Application",
     applicantName: "Vipul Mahajan",
@@ -357,38 +362,42 @@ export default function NOCApprovalDashboard() {
               <CardTitle>Current Document Approval Status</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Document ID
-                  </p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {currentDocument.id}
-                  </p>
+              {currentDocument?.id == "DOC5678" ? (
+                <div>No Assigned Documents</div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Document ID
+                    </p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {currentDocument.id}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Status</p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {currentDocument.status}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      University
+                    </p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {currentDocument.university}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">
+                      Submission Date
+                    </p>
+                    <p className="mt-1 text-lg font-semibold">
+                      {currentDocument.submissionDate}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Status</p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {currentDocument.status}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    University
-                  </p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {currentDocument.university}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Submission Date
-                  </p>
-                  <p className="mt-1 text-lg font-semibold">
-                    {currentDocument.submissionDate}
-                  </p>
-                </div>
-              </div>
+              )}
               <Button
                 className="mt-4"
                 onClick={() => setShowFullImageDialog(true)}

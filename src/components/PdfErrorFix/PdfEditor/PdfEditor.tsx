@@ -193,6 +193,7 @@ interface ApprovalStage {
 }
 
 function EvaluatorMessages({ messages, assigned_evaluator }) {
+  console.log("messages", messages);
   return (
     <Card className="w-full max-w-3xl mx-auto mb-16">
       <CardHeader>
@@ -213,15 +214,15 @@ function EvaluatorMessages({ messages, assigned_evaluator }) {
               ) : (
                 [{id:1, timestamp:new Date().toString(), content:"Seems forged"}].map((message) => (
                   <div
-                    key={message.id}
+                    key={message.message.id}
                     className="mb-4 last:mb-0 p-3 bg-muted rounded-lg"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <p className="text-sm text-muted-foreground">
-                        {message.timestamp.toLocaleString()}
+                        {message.message.timestamp}
                       </p>
                     </div>
-                    <p>{message.content}</p>
+                    <p>{message.message.content}</p>
                   </div>
                 ))
               )}
