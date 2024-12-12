@@ -1,10 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import {createClient} from '@supabase/supabase-js'
-import axios from 'axios'
 import { SERVER_URL } from '@/constants/API'
 import { api } from '@/lib/utils'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { ApplicationDocument } from '@/schemas/applicationSchema'
+import { useNavigate } from 'react-router-dom'
 
 // Initialize Supabase client
 const supabase = createClient(

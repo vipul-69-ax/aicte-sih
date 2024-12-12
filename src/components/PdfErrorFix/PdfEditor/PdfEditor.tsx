@@ -100,6 +100,7 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
 
   return (
     <div className="space-y-4">
+      <EvaluatorMessages/>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium text-gray-900">PDF Content</h2>
         <div className="flex space-x-2">
@@ -154,3 +155,100 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
 };
 
 export default PDFMarkdownConverter;
+
+import {  } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+
+interface Message {
+  id: number
+  content: string
+  timestamp: Date
+}
+
+"use client"
+
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+interface Message {
+  id: number
+  content: string
+  timestamp: Date
+  category: 'info' | 'warning' | 'success'
+}
+
+type ApprovalStatus = 'approved' | 'not approved' | 'pending'
+
+interface ApprovalStage {
+  name: string
+  status: ApprovalStatus
+}
+
+function EvaluatorMessages() {
+  const [messages, setMessages] = useState<Message[]>([
+    { id: 1, content: "Welcome to the evaluation process.", timestamp: new Date(Date.now() - 300000), category: 'info' },
+    { id: 2, content: "Please review the first section of your work.", timestamp: new Date(Date.now() - 200000), category: 'warning' },
+    { id: 3, content: "Your initial approach looks promising.", timestamp: new Date(Date.now() - 100000), category: 'success' },
+  ])
+
+  const [stages, setStages] = useState<ApprovalStage[]>([
+    { name: 'Forgery Check', status: 'pending' },
+    { name: 'Layout Verification', status: 'pending' },
+    { name: 'Content Placeholder Check', status: 'pending' },
+  ])
+
+  useEffect(() => {
+
+   // Update every 5 seconds
+
+    return () => {
+    }
+  }, [])
+
+  return (
+    <Card className="w-full max-w-3xl mx-auto mb-16">
+      <CardHeader>
+        <CardTitle className="text-2xl">Evaluator Status</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="messages">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="messages">Evaluator Messages</TabsTrigger>
+            <TabsTrigger value="status">Approval Status</TabsTrigger>
+          </TabsList>
+          <TabsContent value="messages">
+            <ScrollArea className="h-[400px] w-full pr-4 mt-2">
+              {messages.map(message => (
+                <div key={message.id} className="mb-4 last:mb-0 p-3 bg-muted rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-muted-foreground">
+                      {message.timestamp.toLocaleString()}
+                    </p>
+                  </div>
+                  <p>{message.content}</p>
+                </div>
+              ))}
+            </ScrollArea>
+          </TabsContent>
+          <TabsContent value="status">
+            <div className="mt-2">
+              {stages.map((stage, index) => (
+                <div key={index} className="mb-4 last:mb-0 p-3 bg-muted rounded-lg flex justify-between items-center">
+                  <span>{stage.name}</span>
+                  <Badge variant={
+                    stage.status === 'approved' ? 'default' :
+                    stage.status === 'not approved' ? 'destructive' : 'secondary'
+                  }>
+                    {stage.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  )
+}
+

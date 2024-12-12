@@ -433,9 +433,6 @@ const MainContent: React.FC<MainContentProps> = ({
             }}>
               Verify Infrastructure
             </Button>
-            <Button className="ml-4">
-              Verify Infrastructure
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -482,3 +479,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+
