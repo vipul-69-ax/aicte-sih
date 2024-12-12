@@ -68,53 +68,45 @@ export default function NOCApprovalDashboard() {
   const [showUniversityDialog, setShowUniversityDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showEvaluatorInfo, setShowEvaluatorInfo] = useState(false);
-  const [dashboardData, setDashboardData] = useState()
-  useEffect(()=>{
-    const getReq =async()=>{
-      const resp = await api.get(`${SERVER_URL}/evaluator/data`)
-      setDashboardData(resp.data)
-    }
-    getReq()
-  },[])
+  const [dashboardData, setDashboardData] = useState();
+  useEffect(() => {
+    const getReq = async () => {
+      const resp = await api.get(`${SERVER_URL}/evaluator/data/data`);
+      setDashboardData(resp.data.evaluator);
+    };
+    getReq();
+  }, []);
   // Mock data - replace with actual data in a real application
-  const user = {
-    name: "Vipul Sharma",
-    position: "NOC Approval Evaluator",
-    email: "vipul.sharma@example.com",
-    userId: "VS1234",
-    teacherId: "AICTE-2024-VS1234",
-    workingExperience: "5 years",
-    totalDocumentsApproved: 1287,
-    lastLogin: "2024-12-03 14:30:00",
-  };
-
   const approvalProgress = {
     approved: {
-      count: 150,
-      recentActivity: "Last approved: 10 minutes ago",
-      trend: "+5% this week",
-    },
-    pending: {
-      count: 30,
-      oldestPending: "Oldest: 2 days ago",
-      urgentCount: 5,
+      count: 0,
     },
     rejected: {
-      count: 20,
-      recentRejection: "Last rejected: 1 hour ago",
-      commonReason: "Incomplete documentation",
+      count: 0,
     },
     assigned: {
-      count: 45,
-      recentAssignment: "Last assigned: 30 minutes ago",
-      urgentCount: 3,
+      count: 0,
     },
+  };
+  dashboardData?.assigned_document.forEach((doc) => {
+    if (doc.status == "ASSIGNED") approvalProgress.assigned.count++;
+    if (doc.status == "REJECTED") approvalProgress.rejected.count++;
+    if (doc.status == "APPROVED") approvalProgress.approved.count++;
+  });
+  const user = {
+    name: dashboardData?.email.split("@")[0] ?? "Vipul Sharma",
+    position: dashboardData?.role ?? "NOC Approval Evaluator",
+    email: dashboardData?.email ?? "vipul.sharma@example.com",
+    userId: dashboardData?.evaluator_id ?? "VS1234",
+    totalDocumentsApproved: 1287,
   };
 
   const currentDocument = {
-    id: "DOC5678",
-    status: "In Progress",
-    university: "Future Bright Academy",
+    id: dashboardData?.assigned_document[0].uni_doc_id ?? "DOC5678",
+    status: dashboardData?.assigned_document[0].status ?? "In Progress",
+    university:
+      dashboardData?.assigned_document[0].document.application.university
+        .universityName ?? "Future Bright Academy",
     submissionDate: "2024-11-26",
     type: "NOC Application",
     applicantName: "Vipul Mahajan",
@@ -149,15 +141,15 @@ export default function NOCApprovalDashboard() {
     },
   ];
 
-  const actionOnDoc=async()=>{
-    const resp = await api.post(`${SERVER_URL}/evaluator/action_on_doc`,{
+  const actionOnDoc = async () => {
+    const resp = await api.post(`${SERVER_URL}/evaluator/action_on_doc`, {
       //
-    })
-    if(resp.status === 200){
-      alert("Done")
+    });
+    if (resp.status === 200) {
+      alert("Done");
     }
-  }
-  const [msg, setMsg] = useState<string>()
+  };
+  const [msg, setMsg] = useState<string>();
 
   const handleVerification = () => {
     setIsVerified(!isVerified);
@@ -217,7 +209,7 @@ export default function NOCApprovalDashboard() {
         value: Math.round(document.approvalPercentage * 0.3),
       },
     ];
-    if(!dashboardData) return <>Fetching Data...</>
+    if (!dashboardData) return <>Fetching Data...</>;
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -237,9 +229,7 @@ export default function NOCApprovalDashboard() {
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Check Type</TableCell>
-                  <TableCell>
-                    Forgery Detection
-                  </TableCell>
+                  <TableCell>Forgery Detection</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Approval Date</TableCell>
@@ -252,9 +242,8 @@ export default function NOCApprovalDashboard() {
               </TableBody>
             </Table>
           </div>
-          
         </div>
-        
+
         <div>
           <h3 className="text-lg font-semibold mb-2">Recommendations</h3>
           <ul className="list-disc pl-5 space-y-2">
@@ -306,34 +295,6 @@ export default function NOCApprovalDashboard() {
                 <div className="text-2xl font-bold">
                   {approvalProgress.approved.count}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {approvalProgress.approved.recentActivity}
-                </p>
-                <p className="text-xs text-green-500">
-                  {approvalProgress.approved.trend}
-                </p>
-              </CardContent>
-            </Card>
-            <Card
-              className="cursor-pointer"
-              onClick={() => handleCardClick("Pending")}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Pending Documents
-                </CardTitle>
-                <Clock className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {approvalProgress.pending.count}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {approvalProgress.pending.oldestPending}
-                </p>
-                <p className="text-xs text-yellow-500">
-                  {approvalProgress.pending.urgentCount} urgent
-                </p>
               </CardContent>
             </Card>
             <Card
@@ -350,12 +311,6 @@ export default function NOCApprovalDashboard() {
                 <div className="text-2xl font-bold">
                   {approvalProgress.rejected.count}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {approvalProgress.rejected.recentRejection}
-                </p>
-                <p className="text-xs text-red-500">
-                  Common reason: {approvalProgress.rejected.commonReason}
-                </p>
               </CardContent>
             </Card>
             <Card
@@ -372,12 +327,6 @@ export default function NOCApprovalDashboard() {
                 <div className="text-2xl font-bold">
                   {approvalProgress.assigned.count}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {approvalProgress.assigned.recentAssignment}
-                </p>
-                <p className="text-xs text-blue-500">
-                  {approvalProgress.assigned.urgentCount} urgent
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -705,7 +654,7 @@ export default function NOCApprovalDashboard() {
             type="text"
             placeholder="Send a message to evaluator"
             value={rejectionComments}
-            onChange={(e)=>setRejectionComments(e.target.value)}
+            onChange={(e) => setRejectionComments(e.target.value)}
           />
           <DialogFooter>
             <Button
@@ -755,9 +704,7 @@ export default function NOCApprovalDashboard() {
                   </TableRow>
                   <TableRow>
                     <TableCell>For</TableCell>
-                    <TableCell>
-                      Frogery Detection
-                    </TableCell>
+                    <TableCell>Frogery Detection</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Applicant Name</TableCell>
@@ -888,15 +835,7 @@ export default function NOCApprovalDashboard() {
                 Teacher ID
               </Label>
               <p id="teacherId" className="col-span-2">
-                {user.teacherId}
-              </p>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="experience" className="text-right">
-                Working Experience
-              </Label>
-              <p id="experience" className="col-span-2">
-                {user.workingExperience}
+                {user.userId}
               </p>
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
@@ -905,14 +844,6 @@ export default function NOCApprovalDashboard() {
               </Label>
               <p id="documentsApproved" className="col-span-2">
                 {user.totalDocumentsApproved}
-              </p>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4">
-              <Label htmlFor="lastLogin" className="text-right">
-                Last Login
-              </Label>
-              <p id="lastLogin" className="col-span-2">
-                {user.lastLogin}
               </p>
             </div>
           </div>
