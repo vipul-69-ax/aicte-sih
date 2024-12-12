@@ -65,10 +65,14 @@ const actionOnAssignedDocuments = async (req, res) => {
         data = { messages: messages };
     }
     if (status) {
-        data.status = status;
+        data['status'] = status;
     }
+    let updateDoc
     try {
-        const updateDoc = await prisma.universityDocuments.update({ where: { evaluator_id: evaluator_id } }, { data: data });
+        const response = await prisma.$transaction(async (prisma) => {
+            updateDoc = await prisma.evaluatorDocumentRelation.updateMany({ where: { evaluator_id: evaluator_id, uni_doc_id: uni_doc_id }, data: { status: status } });
+            return await prisma.universityDocuments.update({ where: { uni_doc_id }, data: { messages: messages } });
+        })
         actionLogger.log(new Log(new Date(), undefined, uni_doc_id, evaluator_id, status, Doer.EVALUATOR, LogObject.DOCUMENT));
         return res.status(200).json({ data: updateDoc, message: "Document Updated Successfully." })
     }
