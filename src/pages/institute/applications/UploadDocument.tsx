@@ -55,8 +55,10 @@ export default function UploadLegalDocument() {
       setPdfUrl(URL.createObjectURL(selectedFile));
     }
   };
+  const navigate = useNavigate();
   const handleUpload = () => {
     if (file) {
+      
       uploadFile(file);
     }
   };

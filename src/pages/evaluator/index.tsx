@@ -50,6 +50,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Input } from "@/components/ui/input";
 
 export default function NOCApprovalDashboard() {
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -138,6 +139,8 @@ export default function NOCApprovalDashboard() {
       status: "Rejected",
     },
   ];
+
+  const [msg, setMsg] = useState<string>()
 
   const handleVerification = () => {
     setIsVerified(!isVerified);
@@ -485,13 +488,11 @@ export default function NOCApprovalDashboard() {
                             </DialogHeader>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                {/* <Image
+                                <img
                                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-8aM0wEAduDSlkSrTXn6s5EfRXmbQpa.png"
                                   alt="Affidavit Document"
-                                  width={800}
-                                  height={1000}
                                   className="w-full h-auto"
-                                /> */}
+                                />
                               </div>
                               <div>
                                 <h3 className="text-lg font-semibold mb-4">
@@ -683,6 +684,12 @@ export default function NOCApprovalDashboard() {
               Document {selectedDocument?.id} has been approved
             </p>
           </div>
+          <Input
+            type="text"
+            placeholder="Send a message to evaluator"
+            value={rejectionComments}
+            onChange={(e)=>setRejectionComments(e.target.value)}
+          />
           <DialogFooter>
             <Button
               onClick={confirmApproval}
@@ -693,7 +700,6 @@ export default function NOCApprovalDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      Full Image Dialog
       <Dialog open={showFullImageDialog} onOpenChange={setShowFullImageDialog}>
         <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
           <DialogHeader>
@@ -704,13 +710,11 @@ export default function NOCApprovalDashboard() {
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              {/* <Image
+              <img
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-UEYOmZtNmaCfNVm6fUsGsVComAYWiL.png"
                 alt="Full Document View"
-                width={800}
-                height={1000}
                 className="w-full h-auto"
-              /> */}
+              />
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Key Elements</h3>
@@ -730,6 +734,12 @@ export default function NOCApprovalDashboard() {
                     <TableCell>Purpose</TableCell>
                     <TableCell>
                       Creation of New Password/Forgotten Password
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>For</TableCell>
+                    <TableCell>
+                      Frogery Detection
                     </TableCell>
                   </TableRow>
                   <TableRow>
