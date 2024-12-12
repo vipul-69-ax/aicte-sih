@@ -107,7 +107,10 @@ export default function NOCApprovalDashboard() {
     university:
       dashboardData?.assigned_document[0].document.application.university
         .universityName ?? "Future Bright Academy",
-    submissionDate: "2024-11-26",
+    submissionDate:
+      new Date(
+        dashboardData?.assigned_document[0].document.timestamp
+      ).toDateString() ?? "2024-11-26",
     type: "NOC Application",
     applicantName: "Vipul Mahajan",
     programName: "New Password/Forgotten Password",
@@ -141,9 +144,17 @@ export default function NOCApprovalDashboard() {
     },
   ];
 
-  const actionOnDoc = async () => {
-    const resp = await api.post(`${SERVER_URL}/evaluator/action_on_doc`, {
-      //
+  const actionOnDoc = async (
+    uni_doc_id,
+    status,
+    message,
+    evaluator_id = dashboardData.assigned_document[0].evaluator_id
+  ) => {
+    console.log(status);
+    const resp = await api.post(`${SERVER_URL}/evaluator/data/action_on_doc`, {
+      uni_doc_id: uni_doc_id,
+      status: status,
+      messages: message,
     });
     if (resp.status === 200) {
       alert("Done");
@@ -159,12 +170,17 @@ export default function NOCApprovalDashboard() {
     setShowApprovalDialog(true);
   };
 
-  const confirmApproval = () => {
+  const confirmApproval = async () => {
     setShowApprovalDialog(false);
+    await actionOnDoc(
+      dashboardData.assigned_document[0].document.uni_doc_id,
+      "APPROVED",
+      rejectionComments
+    );
     setIsVerified(false);
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     setShowRejectionDialog(true);
   };
 
@@ -173,8 +189,13 @@ export default function NOCApprovalDashboard() {
     setShowRejectionConfirmationDialog(true);
   };
 
-  const confirmRejection = () => {
+  const confirmRejection = async () => {
     setShowRejectionConfirmationDialog(false);
+    await actionOnDoc(
+      dashboardData.assigned_document[0].document.uni_doc_id,
+      "REJECTED",
+      rejectionComments
+    );
     setRejectionReason("");
     setRejectionComments("");
     setIsVerified(false);
