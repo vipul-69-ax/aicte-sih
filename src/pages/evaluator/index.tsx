@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -50,6 +50,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { Input } from "@/components/ui/input";
+import { SERVER_URL } from "@/constants/API";
+import { api } from "@/lib/utils";
 
 export default function NOCApprovalDashboard() {
   const [selectedDocument, setSelectedDocument] = useState(null);
@@ -65,7 +68,14 @@ export default function NOCApprovalDashboard() {
   const [showUniversityDialog, setShowUniversityDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showEvaluatorInfo, setShowEvaluatorInfo] = useState(false);
-
+  const [dashboardData, setDashboardData] = useState()
+  useEffect(()=>{
+    const getReq =async()=>{
+      const resp = await api.get(`${SERVER_URL}/evaluator/data`)
+      setDashboardData(resp.data)
+    }
+    getReq()
+  },[])
   // Mock data - replace with actual data in a real application
   const user = {
     name: "Vipul Sharma",
@@ -139,6 +149,16 @@ export default function NOCApprovalDashboard() {
     },
   ];
 
+  const actionOnDoc=async()=>{
+    const resp = await api.post(`${SERVER_URL}/evaluator/action_on_doc`,{
+      //
+    })
+    if(resp.status === 200){
+      alert("Done")
+    }
+  }
+  const [msg, setMsg] = useState<string>()
+
   const handleVerification = () => {
     setIsVerified(!isVerified);
   };
@@ -197,7 +217,7 @@ export default function NOCApprovalDashboard() {
         value: Math.round(document.approvalPercentage * 0.3),
       },
     ];
-
+    if(!dashboardData) return <>Fetching Data...</>
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -485,13 +505,11 @@ export default function NOCApprovalDashboard() {
                             </DialogHeader>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                {/* <Image
+                                <img
                                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-8aM0wEAduDSlkSrTXn6s5EfRXmbQpa.png"
                                   alt="Affidavit Document"
-                                  width={800}
-                                  height={1000}
                                   className="w-full h-auto"
-                                /> */}
+                                />
                               </div>
                               <div>
                                 <h3 className="text-lg font-semibold mb-4">
@@ -683,6 +701,12 @@ export default function NOCApprovalDashboard() {
               Document {selectedDocument?.id} has been approved
             </p>
           </div>
+          <Input
+            type="text"
+            placeholder="Send a message to evaluator"
+            value={rejectionComments}
+            onChange={(e)=>setRejectionComments(e.target.value)}
+          />
           <DialogFooter>
             <Button
               onClick={confirmApproval}
@@ -693,7 +717,6 @@ export default function NOCApprovalDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      Full Image Dialog
       <Dialog open={showFullImageDialog} onOpenChange={setShowFullImageDialog}>
         <DialogContent className="sm:max-w-[80vw] sm:max-h-[80vh] overflow-auto">
           <DialogHeader>
@@ -704,13 +727,11 @@ export default function NOCApprovalDashboard() {
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              {/* <Image
+              <img
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202024-12-03%20at%206.16.29%E2%80%AFPM-UEYOmZtNmaCfNVm6fUsGsVComAYWiL.png"
                 alt="Full Document View"
-                width={800}
-                height={1000}
                 className="w-full h-auto"
-              /> */}
+              />
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Key Elements</h3>
@@ -730,6 +751,12 @@ export default function NOCApprovalDashboard() {
                     <TableCell>Purpose</TableCell>
                     <TableCell>
                       Creation of New Password/Forgotten Password
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>For</TableCell>
+                    <TableCell>
+                      Frogery Detection
                     </TableCell>
                   </TableRow>
                   <TableRow>
