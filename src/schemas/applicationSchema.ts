@@ -9,7 +9,9 @@ export interface ApplicationDocument extends SubmitApplicationDocument {
   errors?: Record<string, any>;
   extractedTexts: Record<string,any>;
   uni_doc_uri?: string;
+  assigned_evaluator?: {status:string,check_type: string}
   document: Document;
+  messages?: Record<string, any>[];
   status: "NOT_SUBMITTED" | "SUBMITTED"| "PROCESSING"|"VERIFIED"|"APPROVED"|"REJECTED";
 };
 

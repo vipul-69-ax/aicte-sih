@@ -181,6 +181,7 @@ export default function ErrorFixPage() {
         </div>
       </div>
       <PdfEditor
+        currentUniDoc={currentUniDoc}
         format_uri={currentUniDoc[0].document.format_uri}
         doc_id={currentUniDoc[0].doc_id}
         uni_application_id={application_id}
@@ -193,4 +194,3 @@ export default function ErrorFixPage() {
     </div>
   );
 }
-

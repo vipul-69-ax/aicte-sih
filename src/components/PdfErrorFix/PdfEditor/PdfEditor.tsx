@@ -12,6 +12,7 @@ interface PDFMarkdownConverterProps {
   onError?: (error: string) => void;
   format_uri: string;
   uni_application_id: string;
+  currentUniDoc: ApplicationDocument[];
 }
 
 const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
@@ -20,6 +21,7 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
   format_uri,
   uni_application_id,
   doc_id,
+  currentUniDoc,
 }) => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState<FormattedTextBlock[]>([]);
@@ -100,7 +102,10 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
 
   return (
     <div className="space-y-4">
-      <EvaluatorMessages/>
+      <EvaluatorMessages
+        messages={currentUniDoc[0].messages}
+        assigned_evaluator={currentUniDoc[0].assigned_evaluator}
+      />
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium text-gray-900">PDF Content</h2>
         <div className="flex space-x-2">
@@ -156,56 +161,37 @@ const PDFMarkdownConverter: React.FC<PDFMarkdownConverterProps> = ({
 
 export default PDFMarkdownConverter;
 
-import {  } from 'react'
+import {} from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 interface Message {
-  id: number
-  content: string
-  timestamp: Date
+  id: number;
+  content: string;
+  timestamp: Date;
 }
 
-"use client"
+("use client");
 
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ApplicationDocument } from "@/schemas/applicationSchema";
 
 interface Message {
-  id: number
-  content: string
-  timestamp: Date
-  category: 'info' | 'warning' | 'success'
+  id: number;
+  content: string;
+  timestamp: Date;
+  category: "info" | "warning" | "success";
 }
 
-type ApprovalStatus = 'approved' | 'not approved' | 'pending'
+type ApprovalStatus = "approved" | "not approved" | "pending";
 
 interface ApprovalStage {
-  name: string
-  status: ApprovalStatus
+  name: string;
+  status: ApprovalStatus;
 }
 
-function EvaluatorMessages() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, content: "Welcome to the evaluation process.", timestamp: new Date(Date.now() - 300000), category: 'info' },
-    { id: 2, content: "Please review the first section of your work.", timestamp: new Date(Date.now() - 200000), category: 'warning' },
-    { id: 3, content: "Your initial approach looks promising.", timestamp: new Date(Date.now() - 100000), category: 'success' },
-  ])
-
-  const [stages, setStages] = useState<ApprovalStage[]>([
-    { name: 'Forgery Check', status: 'pending' },
-    { name: 'Layout Verification', status: 'pending' },
-    { name: 'Content Placeholder Check', status: 'pending' },
-  ])
-
-  useEffect(() => {
-
-   // Update every 5 seconds
-
-    return () => {
-    }
-  }, [])
-
+function EvaluatorMessages({ messages, assigned_evaluator }) {
   return (
     <Card className="w-full max-w-3xl mx-auto mb-16">
       <CardHeader>
@@ -219,28 +205,45 @@ function EvaluatorMessages() {
           </TabsList>
           <TabsContent value="messages">
             <ScrollArea className="h-[400px] w-full pr-4 mt-2">
-              {messages.map(message => (
-                <div key={message.id} className="mb-4 last:mb-0 p-3 bg-muted rounded-lg">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-sm text-muted-foreground">
-                      {message.timestamp.toLocaleString()}
-                    </p>
-                  </div>
-                  <p>{message.content}</p>
+              {messages == null ? (
+                <div className="flex h-full justify-center">
+                  <div className="self-center">No Updates from Evaluator</div>
                 </div>
-              ))}
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className="mb-4 last:mb-0 p-3 bg-muted rounded-lg"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-sm text-muted-foreground">
+                        {message.timestamp.toLocaleString()}
+                      </p>
+                    </div>
+                    <p>{message.content}</p>
+                  </div>
+                ))
+              )}
             </ScrollArea>
           </TabsContent>
           <TabsContent value="status">
             <div className="mt-2">
-              {stages.map((stage, index) => (
-                <div key={index} className="mb-4 last:mb-0 p-3 bg-muted rounded-lg flex justify-between items-center">
-                  <span>{stage.name}</span>
-                  <Badge variant={
-                    stage.status === 'approved' ? 'default' :
-                    stage.status === 'not approved' ? 'destructive' : 'secondary'
-                  }>
-                    {stage.status}
+              {assigned_evaluator.map((aev, index) => (
+                <div
+                  key={index}
+                  className="mb-4 last:mb-0 p-3 bg-muted rounded-lg flex justify-between items-center"
+                >
+                  <span>{aev.check_type}</span>
+                  <Badge
+                    variant={
+                      aev.status === "APPROVED"
+                        ? "default"
+                        : aev.status === "REJECTED"
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {aev.status}
                   </Badge>
                 </div>
               ))}
@@ -249,6 +252,5 @@ function EvaluatorMessages() {
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }
-
